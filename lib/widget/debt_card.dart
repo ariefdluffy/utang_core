@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:utang_core/screen/edit_debt_screen.dart';
 import 'package:utang_core/screen/pay_installment.dart';
-import 'package:utang_core/screen/pay_installment_screen.dart';
 import '../models/debt_model.dart';
 
 class DebtCard extends StatelessWidget {

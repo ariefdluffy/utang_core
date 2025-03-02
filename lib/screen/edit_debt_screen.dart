@@ -12,6 +12,11 @@ class EditDebtScreen extends ConsumerWidget {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
 
+  double _getTotalPaid() {
+    return debt.installments
+        .fold(0.0, (sum, installment) => sum + installment.amountPaid);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     titleController.text = debt.title;
@@ -33,7 +38,7 @@ class EditDebtScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 try {
                   final newTitle = titleController.text;
                   final newAmount = double.tryParse(amountController.text);
@@ -43,9 +48,19 @@ class EditDebtScreen extends ConsumerWidget {
                     return;
                   }
 
-                  ref
+                  final totalPaid = _getTotalPaid();
+
+                  // 🔹 Verifikasi jika hutang lebih kecil dari total cicilan
+                  if (newAmount < totalPaid) {
+                    showSnackbar(context,
+                        "Jumlah hutang tidak boleh lebih kecil dari total cicilan (Rp. ${totalPaid.toStringAsFixed(2)})!");
+                    return;
+                  }
+
+                  await ref
                       .read(debtProvider.notifier)
                       .updateDebt(debt.id, newTitle, newAmount);
+
                   showSnackbar(context, "Hutang berhasil diperbarui!",
                       isError: false);
 

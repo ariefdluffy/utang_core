@@ -22,6 +22,9 @@ class Debt {
       userId: json['user_id'] as String,
       title: json['title'] as String,
       amount: (json['amount'] as num).toDouble(),
+      // installments: (json['installments'] as List<dynamic>)
+      //     .map((e) => Installment.fromJson(e))
+      //     .toList()
       installments: (json['installments'] != null)
           ? (json['installments'] as List<dynamic>)
               .map((e) => Installment.fromJson(e))

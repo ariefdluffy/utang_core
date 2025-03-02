@@ -1,4 +1,3 @@
-// Model untuk Cicilan (Installment)
 class Installment {
   final String id;
   final double amountPaid;
@@ -12,17 +11,18 @@ class Installment {
 
   factory Installment.fromJson(Map<String, dynamic> json) {
     return Installment(
-      id: json['id'],
-      amountPaid: (json['amountPaid'] as num).toDouble(),
-      datePaid: DateTime.parse(json['datePaid']),
+      id: json['id'] as String,
+      amountPaid: (json['amount_paid'] as num?)?.toDouble() ??
+          0.0, // 🔹 Jika null, gunakan 0.0
+      datePaid: DateTime.parse(json['date_paid']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'amountPaid': amountPaid,
-      'datePaid': datePaid.toIso8601String(),
+      'amount_paid': amountPaid,
+      'date_paid': datePaid.toIso8601String(),
     };
   }
 }

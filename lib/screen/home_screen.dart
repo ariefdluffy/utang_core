@@ -59,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Catatan Hutang"),
+        title: const Text("Hutang Core"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -68,8 +68,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('Selamat datang, ${user.email} - ${user.id}'),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Selamat datang, ${user.email}'),
+            ),
+          ),
           const SizedBox(height: 10),
           Expanded(
             child: debts.isEmpty

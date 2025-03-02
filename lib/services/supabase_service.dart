@@ -63,13 +63,13 @@ class SupabaseService {
   // 🔹 Simpan cicilan ke database Supabase
   Future<void> addInstallment(String debtId, Installment installment) async {
     try {
-      final response = await supabase.from('installments').insert({
+      await supabase.from('installments').insert({
         'id': installment.id,
         'debt_id': debtId,
         'amount_paid': installment.amountPaid,
         'date_paid': installment.datePaid.toIso8601String(),
       });
-      print(response);
+      // print(response);
       print("✅ Cicilan berhasil disimpan!");
     } catch (e) {
       print("❌ Error menyimpan cicilan: $e");
@@ -77,7 +77,6 @@ class SupabaseService {
     }
   }
 
-  // 🔹 Ambil daftar cicilan berdasarkan `debt_id`
   Future<List<Installment>> getInstallments(String debtId) async {
     try {
       final response = await supabase
@@ -86,12 +85,39 @@ class SupabaseService {
           .eq('debt_id', debtId)
           .order('date_paid', ascending: false);
 
-      return response
+      print("🔹 Riwayat cicilan dari Supabase: $response");
+
+      if (response == null) {
+        print("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
+        return [];
+      }
+
+      if (response is! List) {
+        print("❌ Error: Response bukan List, tipe: ${response.runtimeType}");
+        return [];
+      }
+
+      return (response as List<dynamic>)
           .map<Installment>((data) => Installment.fromJson(data))
           .toList();
     } catch (e) {
-      print("❌ Error mengambil cicilan: $e");
+      print("❌ Error mengambil data cicilan: $e");
       return [];
+    }
+  }
+
+  Future<void> updateDebt(
+      String debtId, String newTitle, double newAmount) async {
+    try {
+      await supabase.from('debts').update({
+        'title': newTitle,
+        'amount': newAmount,
+      }).eq('id', debtId);
+
+      print("✅ Hutang berhasil diperbarui!");
+    } catch (e) {
+      print("❌ Error saat memperbarui hutang: $e");
+      throw e;
     }
   }
 }

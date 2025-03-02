@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/models/debt_model.dart';
 import 'package:utang_core/models/installment_model.dart';
 import 'package:utang_core/services/supabase_service.dart';
@@ -10,6 +11,8 @@ final debtProvider =
 class DebtNotifier extends StateNotifier<List<Debt>> {
   DebtNotifier() : super([]);
   final _supabaseService = SupabaseService();
+
+  final supabase = Supabase.instance.client;
 
   Future<void> addDebt(Debt debt) async {
     try {
@@ -32,31 +35,18 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
     }
   }
 
-  // 🔹 Simpan cicilan ke Supabase & perbarui state Riverpod
   Future<void> addInstallment(String debtId, Installment installment) async {
     try {
       await _supabaseService.addInstallment(
           debtId, installment); // Simpan ke Supabase
 
-      // 🔹 Perbarui state dengan cicilan baru
-      state = state.map((debt) {
-        if (debt.id == debtId) {
-          return Debt(
-            id: debt.id,
-            userId: debt.userId,
-            title: debt.title,
-            amount: debt.amount,
-            installments: [...debt.installments, installment],
-          );
-        }
-        return debt;
-      }).toList();
+      // 🔹 Ambil ulang cicilan dari Supabase setelah menambahkan
+      await fetchInstallments(debtId);
     } catch (e) {
       print("❌ Gagal menambahkan cicilan: $e");
     }
   }
 
-  // 🔹 Ambil cicilan dari Supabase & update state
   Future<void> fetchInstallments(String debtId) async {
     try {
       final installments = await _supabaseService.getInstallments(debtId);
@@ -68,29 +58,74 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
             userId: debt.userId,
             title: debt.title,
             amount: debt.amount,
-            installments: installments,
+            installments:
+                installments, // 🔹 Perbarui cicilan dengan data terbaru
           );
         }
         return debt;
       }).toList();
     } catch (e) {
-      print("❌ Error mengambil cicilan: $e");
+      print(
+          "❌ Error dari code debt_provider fetchInstallments mengambil data cicilan: $e");
+    }
+  }
+
+  Future<List<Installment>> getInstallments(String debtId) async {
+    try {
+      final response = await supabase
+          .from('installments')
+          .select()
+          .eq('debt_id', debtId)
+          .order('date_paid', ascending: false);
+
+      print("Riwayat cicilan $response");
+
+      return response
+          .map<Installment>((data) => Installment.fromJson(data))
+          .toList();
+    } catch (e) {
+      print("❌ Error mengambil data cicilan: $e");
+      return [];
     }
   }
 
   // ✅ Metode update hutang
-  void updateDebt(String debtId, String newTitle, double newAmount) {
-    state = state.map((debt) {
-      if (debt.id == debtId) {
-        return Debt(
-          id: debt.id,
-          userId: debt.userId,
-          title: newTitle,
-          amount: newAmount,
-          installments: debt.installments,
-        );
-      }
-      return debt;
-    }).toList();
+  // void updateDebt(String debtId, String newTitle, double newAmount) {
+  //   state = state.map((debt) {
+  //     if (debt.id == debtId) {
+  //       return Debt(
+  //         id: debt.id,
+  //         userId: debt.userId,
+  //         title: newTitle,
+  //         amount: newAmount,
+  //         installments: debt.installments,
+  //       );
+  //     }
+  //     Logger().e(debt);
+  //     return debt;
+  //   }).toList();
+  // }
+  Future<void> updateDebt(
+      String debtId, String newTitle, double newAmount) async {
+    try {
+      await _supabaseService.updateDebt(
+          debtId, newTitle, newAmount); // 🔹 Update di Supabase
+
+      // 🔹 Perbarui state dengan data terbaru
+      state = state.map((debt) {
+        if (debt.id == debtId) {
+          return Debt(
+            id: debt.id,
+            userId: debt.userId,
+            title: newTitle,
+            amount: newAmount,
+            installments: debt.installments, // Cicilan tetap sama
+          );
+        }
+        return debt;
+      }).toList();
+    } catch (e) {
+      print("❌ Error mengupdate hutang: $e");
+    }
   }
 }
