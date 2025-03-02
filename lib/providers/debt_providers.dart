@@ -128,4 +128,15 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       print("❌ Error mengupdate hutang: $e");
     }
   }
+
+  Future<void> deleteDebt(String debtId) async {
+    try {
+      await _supabaseService.deleteDebt(debtId); // 🔹 Hapus dari Supabase
+
+      // 🔹 Perbarui state Riverpod dengan menghapus hutang dari daftar
+      state = state.where((debt) => debt.id != debtId).toList();
+    } catch (e) {
+      print("❌ Gagal menghapus hutang: $e");
+    }
+  }
 }

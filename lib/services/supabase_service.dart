@@ -120,4 +120,19 @@ class SupabaseService {
       throw e;
     }
   }
+
+  Future<void> deleteDebt(String debtId) async {
+    try {
+      // 🔹 Hapus semua cicilan terkait hutang
+      await supabase.from('installments').delete().eq('debt_id', debtId);
+
+      // 🔹 Hapus hutang utama
+      await supabase.from('debts').delete().eq('id', debtId);
+
+      print("✅ Hutang dan semua cicilannya berhasil dihapus!");
+    } catch (e) {
+      print("❌ Error saat menghapus hutang: $e");
+      throw e;
+    }
+  }
 }
