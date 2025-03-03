@@ -326,9 +326,9 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                   final newTotalPaid = totalPaid + amountPaid;
                   final newRemainingDebt = widget.debt.amount - newTotalPaid;
 
-                  print("ini sisa hutang $newRemainingDebt + $newTotalPaid");
-                  print("ini debt isPaid ${widget.debt.isPaid}");
-                  print("ini debt id ${widget.debt.id}");
+                  // print("ini sisa hutang $newRemainingDebt + $newTotalPaid");
+                  // print("ini debt isPaid ${widget.debt.isPaid}");
+                  // print("ini debt id ${widget.debt.id}");
 
                   if (newRemainingDebt > 0 && widget.debt.isPaid) {
                     await ref
@@ -431,10 +431,10 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                   final totalPaid = _getTotalPaid();
                   final remainingDebt = widget.debt.amount - totalPaid;
 
-                  print(
-                      "🔥 Sisa Hutang: $remainingDebt, Total Dibayar: $totalPaid");
-                  print("🔥 isPaid Sebelum Update: ${widget.debt.isPaid}");
-                  print("🔥 Debt ID: ${widget.debt.id}");
+                  // print(
+                  //     "🔥 Sisa Hutang: $remainingDebt, Total Dibayar: $totalPaid");
+                  // print("🔥 isPaid Sebelum Update: ${widget.debt.isPaid}");
+                  // print("🔥 Debt ID: ${widget.debt.id}");
 
                   // 🔹 Jika masih ada hutang setelah cicilan dihapus, set isPaid = false
                   if (remainingDebt > 0 && widget.debt.isPaid) {

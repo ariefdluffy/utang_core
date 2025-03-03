@@ -1,3 +1,4 @@
+import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/models/debt_model.dart';
 import 'package:utang_core/models/installment_model.dart';
@@ -38,9 +39,9 @@ class SupabaseService {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      print("✅ Hutang berhasil disimpan!");
+      // print("✅ Hutang berhasil disimpan!");
     } catch (e) {
-      print("❌ Error saat menyimpan hutang ke Supabase: $e");
+      Logger().e("❌ Error saat menyimpan hutang ke Supabase: $e");
       throw e;
     }
   }
@@ -55,7 +56,7 @@ class SupabaseService {
       // print(response);
       return response.map<Debt>((debt) => Debt.fromJson(debt)).toList();
     } catch (e) {
-      print("❌ Error mengambil hutang dari Supabase: $e");
+      Logger().e("❌ Error mengambil hutang dari Supabase: $e");
       return [];
     }
   }
@@ -73,7 +74,7 @@ class SupabaseService {
       // // print(installment.datePaid.toUtc().toIso8601String());
       // print("✅ Cicilan berhasil disimpan!");
     } catch (e) {
-      print("❌ Error menyimpan cicilan: $e");
+      Logger().e("❌ Error menyimpan cicilan: $e");
       throw e;
     }
   }
@@ -89,12 +90,13 @@ class SupabaseService {
       // print("🔹 Riwayat cicilan dari Supabase: $response");
 
       if (response == null) {
-        print("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
+        Logger().i("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
         return [];
       }
 
       if (response is! List) {
-        print("❌ Error: Response bukan List, tipe: ${response.runtimeType}");
+        Logger()
+            .e("❌ Error: Response bukan List, tipe: ${response.runtimeType}");
         return [];
       }
 
@@ -102,7 +104,7 @@ class SupabaseService {
           .map<Installment>((data) => Installment.fromJson(data))
           .toList();
     } catch (e) {
-      print("❌ Error mengambil data cicilan: $e");
+      Logger().e("❌ Error mengambil data cicilan: $e");
       return [];
     }
   }
@@ -118,7 +120,7 @@ class SupabaseService {
 
       // print("✅ Hutang berhasil diperbarui!");
     } catch (e) {
-      print("❌ Error saat memperbarui hutang: $e");
+      Logger().e("❌ Error saat memperbarui hutang: $e");
       throw e;
     }
   }
@@ -145,9 +147,9 @@ class SupabaseService {
   Future<void> deleteInstallment(String installmentId) async {
     try {
       await supabase.from('installments').delete().eq('id', installmentId);
-      print("✅ Cicilan berhasil dihapus!");
+      // print("✅ Cicilan berhasil dihapus!");
     } catch (e) {
-      print("❌ Error menghapus cicilan: $e");
+      Logger().d("❌ Error menghapus cicilan: $e");
       throw e;
     }
   }

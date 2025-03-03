@@ -65,6 +65,8 @@ import 'package:utang_core/utils/snackbar_helper.dart';
 // }
 
 class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -124,10 +126,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Text(
                       "Login | Hutang Core",
                       style:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    const Text("Masuk untuk mengelola catatan hutang Anda",
+                    const Text("Mengelola catatan hutang Anda",
                         style: TextStyle(fontSize: 16, color: Colors.grey)),
                     const SizedBox(height: 20),
                     TextField(
@@ -183,7 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           );
                         },
                         child: const Text("Belum punya akun? Daftar",
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 16, color: Colors.deepPurpleAccent)),
                       ),
                     ),

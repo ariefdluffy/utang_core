@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:utang_core/models/debt_model.dart';
+import 'package:utang_core/utils/network_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 import 'package:uuid/uuid.dart';
 import 'package:utang_core/providers/auth_providers.dart';
@@ -105,7 +106,14 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
 
       await ref.read(debtProvider.notifier).addDebt(newDebt);
 
-      showSnackbar(context, "Hutang berhasil ditambahkan!", isError: false);
+      // 🔹 Cek apakah ada koneksi internet
+      if (await NetworkHelper.hasInternetConnection()) {
+        showSnackbar(context, "Hutang berhasil ditambahkan!", isError: false);
+      } else {
+        showSnackbar(context,
+            "Hutang disimpan sementara. Akan dikirim saat internet tersedia!",
+            isError: false);
+      }
       Navigator.pop(context);
     } catch (e) {
       showSnackbar(context, "Error: ${e.toString()}");
@@ -128,13 +136,6 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const Text(
-            //   "Masukkan Detail Hutang",
-            //   style: TextStyle(
-            //       fontSize: 20,
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.black87),
-            // ),
             const SizedBox(height: 10),
             TextField(
               controller: titleController,

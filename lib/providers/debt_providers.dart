@@ -3,7 +3,9 @@ import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/models/debt_model.dart';
 import 'package:utang_core/models/installment_model.dart';
+import 'package:utang_core/services/local_storage_service.dart';
 import 'package:utang_core/services/supabase_service.dart';
+import 'package:utang_core/utils/network_helper.dart';
 
 final debtProvider =
     StateNotifierProvider<DebtNotifier, List<Debt>>((ref) => DebtNotifier());
@@ -16,13 +18,60 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
 
   Future<void> addDebt(Debt debt) async {
     try {
-      // 🔹 Simpan ke Supabase
-      await _supabaseService.addDebt(debt);
+      if (await NetworkHelper.hasInternetConnection()) {
+        // 🔹 Simpan ke Supabase
+        await _supabaseService.addDebt(debt);
+        // 🔹 Jika sukses, tambahkan ke state lokal
+        state = [...state, debt];
+      } else {
+        // 🔹 Jika tidak ada internet, simpan ke penyimpanan lokal
+        final offlineDebts = await LocalStorageService.getOfflineDebts();
+        offlineDebts.add(debt);
+        Logger().i(offlineDebts);
 
-      // 🔹 Jika sukses, tambahkan ke state lokal
-      state = [...state, debt];
+        await LocalStorageService.saveOfflineDebts(offlineDebts);
+
+        // 🔹 Tambahkan ke state agar langsung muncul di UI meskipun offline
+        state = [...state, debt];
+      }
     } catch (e) {
-      print("❌ Gagal menyimpan ke Supabase: $e");
+      Logger().e("❌ Gagal menyimpan ke Supabase: $e");
+    }
+  }
+
+  // 🔹 Sinkronisasi data offline ke Supabase saat ada internet
+  Future<void> syncOfflineDebts() async {
+    if (await NetworkHelper.hasInternetConnection()) {
+      final offlineDebts = await LocalStorageService.getOfflineDebts();
+
+      Logger().i(offlineDebts);
+
+      for (var debt in offlineDebts) {
+        await _supabaseService.addDebt(debt);
+      }
+      await LocalStorageService.clearOfflineDebts();
+      // 🔹 Ambil userId dari Supabase sebelum memanggil fetchDebts()
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        fetchDebts(user.id); // 🔹 Refresh data dari Supabase
+      }
+    }
+  }
+
+  // 🔹 Sinkronisasi data offline ke Supabase saat ada internet
+  Future<void> syncOfflineInstallments() async {
+    if (await NetworkHelper.hasInternetConnection()) {
+      final offlineInstallments =
+          await LocalStorageService.getOfflineInstallments();
+      for (var installment in offlineInstallments) {
+        await _supabaseService.addInstallment(installment.id, installment);
+      }
+      await LocalStorageService.clearOfflineInstallments();
+      // 🔹 Ambil userId dari Supabase sebelum memanggil fetchDebts()
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        await fetchDebts(user.id); // ✅ Pastikan fetchDebts() menerima userId
+      }
     }
   }
 
@@ -31,19 +80,27 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       final debtsFromDb = await _supabaseService.getDebts(userId);
       state = debtsFromDb; // 🔹 Perbarui state dengan data dari Supabase
     } catch (e) {
-      print("❌ Error mengambil data hutang: $e");
+      Logger().e("❌ Error mengambil data hutang: $e");
     }
   }
 
   Future<void> addInstallment(String debtId, Installment installment) async {
     try {
-      await _supabaseService.addInstallment(
-          debtId, installment); // Simpan ke Supabase
-      Logger().i(installment.datePaid);
-      // 🔹 Ambil ulang cicilan dari Supabase setelah menambahkan
-      await fetchInstallments(debtId);
+      if (await NetworkHelper.hasInternetConnection()) {
+        await _supabaseService.addInstallment(
+            debtId, installment); // Simpan ke Supabase
+        Logger().i(installment.datePaid);
+        // 🔹 Ambil ulang cicilan dari Supabase setelah menambahkan
+        await fetchInstallments(debtId);
+      } else {
+        // 🔹 Jika tidak ada internet, simpan cicilan ke penyimpanan lokal
+        final offlineInstallments =
+            await LocalStorageService.getOfflineInstallments();
+        offlineInstallments.add(installment);
+        await LocalStorageService.saveOfflineInstallments(offlineInstallments);
+      }
     } catch (e) {
-      print("❌ Gagal menambahkan cicilan: $e");
+      Logger().e("❌ Gagal menambahkan cicilan: $e");
     }
   }
 
@@ -66,7 +123,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
         return debt;
       }).toList();
     } catch (e) {
-      print(
+      Logger().e(
           "❌ Error dari code debt_provider fetchInstallments mengambil data cicilan: $e");
     }
   }
@@ -79,13 +136,13 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
           .eq('debt_id', debtId)
           .order('date_paid', ascending: true);
 
-      print("Riwayat cicilan $response");
+      Logger().e("Riwayat cicilan $response");
 
       return response
           .map<Installment>((data) => Installment.fromJson(data))
           .toList();
     } catch (e) {
-      print("❌ Error mengambil data cicilan: $e");
+      Logger().e("❌ Error mengambil data cicilan: $e");
       return [];
     }
   }
@@ -111,7 +168,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
         return debt;
       }).toList();
     } catch (e) {
-      print("❌ Error mengupdate hutang: $e");
+      Logger().e("❌ Error mengupdate hutang: $e");
     }
   }
 
@@ -137,7 +194,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
         return debt;
       }).toList();
     } catch (e) {
-      print("❌ Error mengupdate status hutang: $e");
+      Logger().e("❌ Error mengupdate status hutang: $e");
     }
   }
 
@@ -148,7 +205,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       // 🔹 Perbarui state Riverpod dengan menghapus hutang dari daftar
       state = state.where((debt) => debt.id != debtId).toList();
     } catch (e) {
-      print("❌ Gagal menghapus hutang: $e");
+      Logger().e("❌ Gagal menghapus hutang: $e");
     }
   }
 
@@ -173,7 +230,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
         return debt;
       }).toList();
     } catch (e) {
-      print("❌ Gagal menghapus cicilan: $e");
+      Logger().e("❌ Gagal menghapus cicilan: $e");
     }
   }
 }
