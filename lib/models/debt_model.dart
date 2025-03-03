@@ -7,15 +7,16 @@ class Debt {
   final double amount;
   final List<Installment> installments;
   final DateTime createdAt;
+  final bool isPaid;
 
-  Debt({
-    required this.id,
-    required this.userId,
-    required this.title,
-    required this.amount,
-    required this.installments,
-    required this.createdAt,
-  });
+  Debt(
+      {required this.id,
+      required this.userId,
+      required this.title,
+      required this.amount,
+      required this.installments,
+      required this.createdAt,
+      required this.isPaid});
 
   // 🔹 Perbaikan: Tangani `installments` yang mungkin null
   factory Debt.fromJson(Map<String, dynamic> json) {
@@ -33,6 +34,7 @@ class Debt {
               .toList()
           : [], // 🔹 Gunakan list kosong jika installments null
       createdAt: DateTime.parse(json['created_at']),
+      isPaid: json['is_paid'] ?? false,
     );
   }
 
@@ -44,6 +46,7 @@ class Debt {
       'amount': amount,
       'installments': installments.map((e) => e.toJson()).toList(),
       'created_at': createdAt.toIso8601String(),
+      'is_paid': isPaid,
     };
   }
 }

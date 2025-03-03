@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/auth_providers.dart';
-import 'package:utang_core/screen/login_screen.dart';
+import 'package:utang_core/screen/auth/login_screen.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 
 // class RegisterScreen extends ConsumerWidget {
@@ -143,21 +143,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
-                      "Buat Akun",
+                      "Buat Akun | Hutang Core",
                       style:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     const Text("Daftar untuk mulai mencatat hutang Anda",

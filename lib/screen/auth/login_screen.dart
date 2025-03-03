@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/auth_providers.dart';
-import 'package:utang_core/screen/register_screen.dart';
+import 'package:utang_core/screen/auth/register_screen.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 
 // class LoginScreen extends ConsumerWidget {
@@ -110,19 +110,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               elevation: 5,
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Login",
+                      "Login | Hutang Core",
                       style:
                           TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     ),

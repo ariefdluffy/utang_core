@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/config/supabase_config.dart';
 import 'package:utang_core/router.dart';
 import 'package:utang_core/screen/home_screen.dart';
-import 'package:utang_core/screen/login_screen.dart';
+import 'package:utang_core/screen/auth/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

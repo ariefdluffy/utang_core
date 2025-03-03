@@ -100,6 +100,7 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
         amount: double.parse(amountController.text.trim()),
         installments: [],
         createdAt: DateTime.now(),
+        isPaid: false,
       );
 
       await ref.read(debtProvider.notifier).addDebt(newDebt);

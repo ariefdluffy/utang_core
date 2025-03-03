@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
-import 'package:utang_core/screen/login_screen.dart';
+import 'package:utang_core/screen/auth/login_screen.dart';
+import 'package:utang_core/screen/pay_installment_screen.dart';
 import 'package:utang_core/widget/debt_card.dart';
-import 'register_screen.dart';
+import 'auth/register_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -167,9 +168,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : ListView.builder(
                     itemCount: debts.length,
                     itemBuilder: (context, index) {
-                      return DebtCard(
-                          debt: debts[
-                              index]); // 🔹 Menampilkan DebtCard yang sudah diperbarui
+                      final debt = debts[index];
+                      return GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PayInstallmentScreen(debt: debt)));
+                          // 🔹 Refresh data setelah kembali dari halaman cicilan
+                          ref.read(debtProvider.notifier).fetchDebts(user.id);
+                        },
+                        child: DebtCard(debt: debts[index]),
+                      ); // 🔹 Menampilkan DebtCard yang sudah diperbarui
                     },
                   ),
           ),

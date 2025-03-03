@@ -322,6 +322,22 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                       .read(debtProvider.notifier)
                       .addInstallment(widget.debt.id, installment);
 
+                  // 🔹 Cek apakah hutang masih ada setelah cicilan ditambahkan
+                  final newTotalPaid = totalPaid + amountPaid;
+                  final newRemainingDebt = widget.debt.amount - newTotalPaid;
+
+                  print("ini sisa hutang $newRemainingDebt + $newTotalPaid");
+                  print("ini debt isPaid ${widget.debt.isPaid}");
+                  print("ini debt id ${widget.debt.id}");
+
+                  if (newRemainingDebt > 0 && widget.debt.isPaid) {
+                    await ref
+                        .read(debtProvider.notifier)
+                        .updateDebtStatus(widget.debt.id, false);
+                    Logger().i(
+                        "🔄 Status hutang diperbarui menjadi BELUM LUNAS (is_paid = false)");
+                  }
+
                   showSnackbar(context, "Cicilan berhasil ditambahkan!",
                       isError: false);
 
@@ -353,6 +369,45 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
     );
   }
 
+  // void _deleteInstallment(String installmentId) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text("Hapus Cicilan?"),
+  //         content: const Text("Apakah Anda yakin ingin menghapus cicilan ini?"),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: const Text("Batal"),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () async {
+  //               try {
+  //                 await ref
+  //                     .read(debtProvider.notifier)
+  //                     .deleteInstallment(widget.debt.id, installmentId);
+  //                 showSnackbar(context, "Cicilan berhasil dihapus!",
+  //                     isError: false);
+  //                 Navigator.pop(
+  //                     context); // 🔹 Tutup dialog setelah hapus sukses
+  //               } catch (e) {
+  //                 showSnackbar(
+  //                     context, "Gagal menghapus cicilan: ${e.toString()}");
+  //               }
+  //             },
+  //             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+  //             child: const Text(
+  //               "Hapus",
+  //               style: TextStyle(color: Colors.white),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
   void _deleteInstallment(String installmentId) {
     showDialog(
       context: context,
@@ -371,17 +426,39 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                   await ref
                       .read(debtProvider.notifier)
                       .deleteInstallment(widget.debt.id, installmentId);
+
+                  // 🔹 Hitung ulang total pembayaran setelah cicilan dihapus
+                  final totalPaid = _getTotalPaid();
+                  final remainingDebt = widget.debt.amount - totalPaid;
+
+                  print(
+                      "🔥 Sisa Hutang: $remainingDebt, Total Dibayar: $totalPaid");
+                  print("🔥 isPaid Sebelum Update: ${widget.debt.isPaid}");
+                  print("🔥 Debt ID: ${widget.debt.id}");
+
+                  // 🔹 Jika masih ada hutang setelah cicilan dihapus, set isPaid = false
+                  if (remainingDebt > 0 && widget.debt.isPaid) {
+                    await ref
+                        .read(debtProvider.notifier)
+                        .updateDebtStatus(widget.debt.id, false);
+                    Logger().i(
+                        "🔄 Status hutang diperbarui menjadi BELUM LUNAS (is_paid = false)");
+                  }
+
                   showSnackbar(context, "Cicilan berhasil dihapus!",
                       isError: false);
-                  Navigator.pop(
-                      context); // 🔹 Tutup dialog setelah hapus sukses
+                  Navigator.pop(context); // 🔹 Tutup dialog setelah sukses
+                  setState(() {}); // 🔹 Perbarui UI setelah cicilan dihapus
                 } catch (e) {
                   showSnackbar(
                       context, "Gagal menghapus cicilan: ${e.toString()}");
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text("Hapus"),
+              child: const Text(
+                "Hapus",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -397,6 +474,18 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
         );
     final totalPaid = _getTotalPaid();
     final remainingDebt = updatedDebt.amount - totalPaid;
+
+    // 🔹 Jika sisa hutang = 0, update status hutang menjadi lunas
+    if (remainingDebt == 0 && !updatedDebt.isPaid) {
+      Future.microtask(() {
+        ref.read(debtProvider.notifier).updateDebt(
+              updatedDebt.id,
+              updatedDebt.title, // 🔹 Gunakan title lama
+              updatedDebt.amount, // 🔹 Gunakan jumlah hutang lama
+              true, // 🔹 Ubah status menjadi lunas
+            );
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -414,7 +503,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -422,7 +511,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                       updatedDebt
                           .title, // 🔹 Tambahkan Title Hutang dari tabel debts
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -452,7 +541,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                       return Card(
                         elevation: 2,
                         margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                            horizontal: 8, vertical: 8),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         child: ListTile(
@@ -462,10 +551,6 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87)),
-                          // title: Text(installment.amountPaid.toStringAsFixed(2),
-                          //     style: const TextStyle(
-                          //         fontWeight: FontWeight.bold,
-                          //         color: Colors.black87)),
                           subtitle: Text(
                               DateHelper.formatTanggalLengkap(
                                   installment.datePaid),
@@ -481,7 +566,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                             height: 30,
                             decoration: const BoxDecoration(
                               color: Colors
-                                  .blueGrey, // Warna latar belakang lingkaran
+                                  .green, // Warna latar belakang lingkaran
                               shape: BoxShape.circle, // Bentuk lingkaran
                             ),
                             alignment: Alignment.center,
@@ -501,50 +586,46 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        color: Colors
-            .white, // 🔹 Tambahkan latar belakang putih agar tombol jelas terlihat
-        child: ElevatedButton(
-          onPressed: _addInstallment,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding: const EdgeInsets.symmetric(
-                vertical: 16), // 🔹 Ukuran tombol lebih besar
-          ),
-          child: const Text(
-            "Tambah Cicilan",
-            style: const TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-      ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _addInstallment,
-      //   backgroundColor: Colors.green,
-      //   child: const Icon(Icons.add),
-      //   // label: const Text("Tambah"),
-      // ),
+      bottomNavigationBar: remainingDebt >
+              0 // 🔹 Tombol tambah cicilan hanya muncul jika hutang belum lunas
+          ? Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: ElevatedButton(
+                onPressed: _addInstallment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  "Tambah Cicilan",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ),
+            )
+          : null, // 🔹 Jika hutang lunas, tombol tidak ditampilkan
     );
   }
 
   Widget _buildDebtInfo(String title, double amount, Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title,
               style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87)),
           Text(CurrencyHelper.formatRupiah(amount),
               style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+                  fontSize: 14, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );

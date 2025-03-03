@@ -60,7 +60,8 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
               amount: debt.amount,
               installments:
                   installments, // 🔹 Perbarui cicilan dengan data terbaru
-              createdAt: debt.createdAt);
+              createdAt: debt.createdAt,
+              isPaid: debt.isPaid);
         }
         return debt;
       }).toList();
@@ -89,44 +90,54 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
     }
   }
 
-  // ✅ Metode update hutang
-  // void updateDebt(String debtId, String newTitle, double newAmount) {
-  //   state = state.map((debt) {
-  //     if (debt.id == debtId) {
-  //       return Debt(
-  //         id: debt.id,
-  //         userId: debt.userId,
-  //         title: newTitle,
-  //         amount: newAmount,
-  //         installments: debt.installments,
-  //       );
-  //     }
-  //     Logger().e(debt);
-  //     return debt;
-  //   }).toList();
-  // }
   Future<void> updateDebt(
-      String debtId, String newTitle, double newAmount) async {
+      String debtId, String newTitle, double newAmount, bool isPaid) async {
     try {
       await _supabaseService.updateDebt(
-          debtId, newTitle, newAmount); // 🔹 Update di Supabase
+          debtId, newTitle, newAmount, isPaid); // 🔹 Update di Supabase
 
       // 🔹 Perbarui state dengan data terbaru
       state = state.map((debt) {
         if (debt.id == debtId) {
           return Debt(
-            id: debt.id,
-            userId: debt.userId,
-            title: newTitle,
-            amount: newAmount,
-            installments: debt.installments, // Cicilan tetap sama
-            createdAt: debt.createdAt,
-          );
+              id: debt.id,
+              userId: debt.userId,
+              title: newTitle,
+              amount: newAmount,
+              installments: debt.installments, // Cicilan tetap sama
+              createdAt: debt.createdAt,
+              isPaid: isPaid);
         }
         return debt;
       }).toList();
     } catch (e) {
       print("❌ Error mengupdate hutang: $e");
+    }
+  }
+
+  Future<void> updateDebtStatus(String debtId, bool isPaid) async {
+    try {
+      await _supabaseService.updateDebtStatus(debtId, isPaid);
+
+      Logger().i("is paid: $isPaid");
+      // 🔹 Perbarui state hanya pada `isPaid`
+      state = state.map((debt) {
+        if (debt.id == debtId) {
+          return Debt(
+            id: debt.id,
+            userId: debt.userId,
+            title: debt.title, // Tetap sama
+            amount: debt.amount, // Tetap sama
+            installments: debt.installments, // Tetap sama
+            createdAt: debt.createdAt, // Tetap sama
+            isPaid: isPaid, // 🔹 Hanya isPaid yang berubah
+          );
+        }
+        Logger().i("is paid: ${debt.isPaid}");
+        return debt;
+      }).toList();
+    } catch (e) {
+      print("❌ Error mengupdate status hutang: $e");
     }
   }
 
@@ -149,14 +160,15 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       state = state.map((debt) {
         if (debt.id == debtId) {
           return Debt(
-            id: debt.id,
-            userId: debt.userId,
-            title: debt.title,
-            amount: debt.amount,
-            installments:
-                debt.installments.where((i) => i.id != installmentId).toList(),
-            createdAt: debt.createdAt,
-          );
+              id: debt.id,
+              userId: debt.userId,
+              title: debt.title,
+              amount: debt.amount,
+              installments: debt.installments
+                  .where((i) => i.id != installmentId)
+                  .toList(),
+              createdAt: debt.createdAt,
+              isPaid: debt.isPaid);
         }
         return debt;
       }).toList();

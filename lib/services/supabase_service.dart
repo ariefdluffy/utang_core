@@ -69,9 +69,9 @@ class SupabaseService {
         'amount_paid': installment.amountPaid,
         'date_paid': installment.datePaid.toUtc().toIso8601String(),
       });
-      print(installment.amountPaid);
-      print(installment.datePaid.toUtc().toIso8601String());
-      print("✅ Cicilan berhasil disimpan!");
+      // // print(installment.amountPaid);
+      // // print(installment.datePaid.toUtc().toIso8601String());
+      // print("✅ Cicilan berhasil disimpan!");
     } catch (e) {
       print("❌ Error menyimpan cicilan: $e");
       throw e;
@@ -108,18 +108,23 @@ class SupabaseService {
   }
 
   Future<void> updateDebt(
-      String debtId, String newTitle, double newAmount) async {
+      String debtId, String newTitle, double newAmount, bool isPaid) async {
     try {
       await supabase.from('debts').update({
         'title': newTitle,
         'amount': newAmount,
+        'is_paid': isPaid,
       }).eq('id', debtId);
 
-      print("✅ Hutang berhasil diperbarui!");
+      // print("✅ Hutang berhasil diperbarui!");
     } catch (e) {
       print("❌ Error saat memperbarui hutang: $e");
       throw e;
     }
+  }
+
+  Future<void> updateDebtStatus(String debtId, bool isPaid) async {
+    await supabase.from('debts').update({'is_paid': isPaid}).eq('id', debtId);
   }
 
   Future<void> deleteDebt(String debtId) async {

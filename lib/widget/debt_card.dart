@@ -40,8 +40,23 @@ class DebtCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 5),
-              Text(CurrencyHelper.formatRupiah(debt.amount),
-                  style: TextStyle(fontSize: 18, color: Colors.grey[700])),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    CurrencyHelper.formatRupiah(debt.amount),
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  ),
+                  Text(
+                    debt.isPaid ? "Lunas" : "Belum Lunas",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: debt.isPaid ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ],
+              ),
               // const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

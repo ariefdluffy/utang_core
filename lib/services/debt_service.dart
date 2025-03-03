@@ -6,8 +6,13 @@ class DebtService {
   static final supabase = Supabase.instance.client;
 
   static Future<List<Debt>> getDebts(String userId) async {
-    final response =
-        await supabase.from('debts').select().eq('user_id', userId);
+    final response = await supabase
+        .from('debts')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at',
+            ascending: false); // 🔹 Urutkan berdasarkan created_at ASC
+
     return response.map((e) => Debt.fromJson(e)).toList();
   }
 
@@ -29,5 +34,9 @@ class DebtService {
 
   static Future<void> updateDebt(Debt debt) async {
     await supabase.from('debts').update(debt.toJson()).eq('id', debt.id);
+  }
+
+  static Future<void> updateDebtStatus(String debtId, bool isPaid) async {
+    await supabase.from('debts').update({'is_paid': isPaid}).eq('id', debtId);
   }
 }

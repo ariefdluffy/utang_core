@@ -129,7 +129,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
 
       await ref
           .read(debtProvider.notifier)
-          .updateDebt(widget.debt.id, newTitle, newAmount);
+          .updateDebt(widget.debt.id, newTitle, newAmount, widget.debt.isPaid);
       showSnackbar(context, "Hutang berhasil diperbarui!", isError: false);
 
       Navigator.pop(context);
@@ -142,6 +142,8 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isPaid = widget.debt.isPaid;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Hutang",
@@ -154,15 +156,15 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // const SizedBox(height: 15),
+            // const Text(
+            //   "Perbarui Detail Hutang",
+            //   style: TextStyle(
+            //       fontSize: 20,
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black87),
+            // ),
             const SizedBox(height: 10),
-            const Text(
-              "Perbarui Detail Hutang",
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87),
-            ),
-            const SizedBox(height: 20),
             TextField(
               controller: titleController,
               decoration: InputDecoration(
@@ -172,7 +174,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
                     OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
             TextField(
               controller: amountController,
               decoration: InputDecoration(
@@ -183,7 +185,17 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
+            SwitchListTile(
+              title: const Text("Status Hutang"),
+              value: isPaid,
+              onChanged: (value) {
+                setState(() {
+                  isPaid = value;
+                });
+              },
+            ),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               height: 50,
