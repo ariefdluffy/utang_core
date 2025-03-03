@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/debt_providers.dart';
+import 'package:utang_core/utils/currency_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 import '../models/debt_model.dart';
 
@@ -96,6 +97,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
   void initState() {
     super.initState();
     titleController.text = widget.debt.title;
+    // amountController.text = CurrencyHelper.formatRupiah(widget.debt.amount);
     amountController.text = widget.debt.amount.toString();
   }
 
@@ -118,7 +120,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
     // 🔹 Cek apakah jumlah hutang lebih kecil dari total cicilan yang telah dibayar
     if (newAmount < totalPaid) {
       showSnackbar(context,
-          "Jumlah hutang tidak boleh lebih kecil dari total cicilan (Rp. ${totalPaid.toStringAsFixed(2)})!");
+          "Jumlah hutang tidak boleh lebih kecil dari total cicilan  ${CurrencyHelper.formatRupiah(totalPaid)} (Rp. ${totalPaid.toStringAsFixed(2)})!");
       return;
     }
 
@@ -148,10 +150,11 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
         foregroundColor: Colors.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 10),
             const Text(
               "Perbarui Detail Hutang",
               style: TextStyle(
@@ -159,7 +162,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.black87),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             TextField(
               controller: titleController,
               decoration: InputDecoration(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/config/supabase_config.dart';
 import 'package:utang_core/router.dart';
@@ -9,6 +10,7 @@ import 'package:utang_core/screen/login_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseConfig.initialize(); //
+  await initializeDateFormatting('id_ID', null);
   runApp(const ProviderScope(child: MainApp()));
 }
 

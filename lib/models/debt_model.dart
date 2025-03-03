@@ -6,6 +6,7 @@ class Debt {
   final String title;
   final double amount;
   final List<Installment> installments;
+  final DateTime createdAt;
 
   Debt({
     required this.id,
@@ -13,6 +14,7 @@ class Debt {
     required this.title,
     required this.amount,
     required this.installments,
+    required this.createdAt,
   });
 
   // 🔹 Perbaikan: Tangani `installments` yang mungkin null
@@ -30,6 +32,7 @@ class Debt {
               .map((e) => Installment.fromJson(e))
               .toList()
           : [], // 🔹 Gunakan list kosong jika installments null
+      createdAt: DateTime.parse(json['created_at']),
     );
   }
 
@@ -40,6 +43,7 @@ class Debt {
       'title': title,
       'amount': amount,
       'installments': installments.map((e) => e.toJson()).toList(),
+      'created_at': createdAt.toIso8601String(),
     };
   }
 }

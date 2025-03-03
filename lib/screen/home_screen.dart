@@ -131,7 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       Future.microtask(() {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => RegisterScreen()),
+          MaterialPageRoute(builder: (context) => const RegisterScreen()),
         );
       });
       return const Scaffold(
@@ -175,19 +175,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, "/add-debt"),
-        // icon: const Icon(Icons.add),
-        // label: const Text(
-        //   "Tambah",
-        //   style: TextStyle(color: Colors.white),
-        // ),
-        backgroundColor: Colors.deepPurpleAccent,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white70,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        color:
+            Colors.white, // 🔹 Latar belakang putih agar tombol terlihat jelas
+        child: ElevatedButton(
+          onPressed: () => Navigator.pushNamed(context, "/add-debt"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurpleAccent,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(
+                vertical: 16), // 🔹 Tombol lebih besar
+          ),
+          child: const Text(
+            "Tambah Hutang",
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
         ),
       ),
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () => Navigator.pushNamed(context, "/add-debt"),
+      //   // icon: const Icon(Icons.add),
+      //   // label: const Text(
+      //   //   "Tambah",
+      //   //   style: TextStyle(color: Colors.white),
+      //   // ),
+      //   backgroundColor: Colors.deepPurpleAccent,
+      //   child: const Icon(
+      //     Icons.add,
+      //     color: Colors.white70,
+      //   ),
+      // ),
     );
   }
 

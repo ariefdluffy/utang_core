@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:utang_core/models/installment_model.dart';
 import 'package:utang_core/providers/debt_providers.dart';
+import 'package:utang_core/utils/currency_helper.dart';
+import 'package:utang_core/utils/date_helper.dart';
 import 'package:uuid/uuid.dart';
 import '../models/debt_model.dart';
 import '../utils/snackbar_helper.dart';
@@ -310,12 +313,15 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                   final installment = Installment(
                     id: uuid.v4(),
                     amountPaid: amountPaid,
-                    datePaid: DateTime.now(),
+                    datePaid: DateTime.now().toUtc(),
                   );
+
+                  Logger().i(installment.datePaid);
 
                   await ref
                       .read(debtProvider.notifier)
                       .addInstallment(widget.debt.id, installment);
+
                   showSnackbar(context, "Cicilan berhasil ditambahkan!",
                       isError: false);
 
@@ -333,9 +339,49 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text("Simpan",
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              child: const Text(
+                "Simpan",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteInstallment(String installmentId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Hapus Cicilan?"),
+          content: const Text("Apakah Anda yakin ingin menghapus cicilan ini?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  await ref
+                      .read(debtProvider.notifier)
+                      .deleteInstallment(widget.debt.id, installmentId);
+                  showSnackbar(context, "Cicilan berhasil dihapus!",
+                      isError: false);
+                  Navigator.pop(
+                      context); // 🔹 Tutup dialog setelah hapus sukses
+                } catch (e) {
+                  showSnackbar(
+                      context, "Gagal menghapus cicilan: ${e.toString()}");
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text("Hapus"),
             ),
           ],
         );
@@ -362,7 +408,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             child: Card(
               elevation: 5,
               shape: RoundedRectangleBorder(
@@ -370,11 +416,23 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Text(
+                      updatedDebt
+                          .title, // 🔹 Tambahkan Title Hutang dari tabel debts
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const Divider(),
                     _buildDebtInfo(
                         "Total Hutang", updatedDebt.amount, Colors.blueGrey),
+                    const Divider(),
                     _buildDebtInfo("Total Dibayar", totalPaid, Colors.green),
+                    const Divider(),
                     _buildDebtInfo("Sisa Hutang", remainingDebt, Colors.red),
                   ],
                 ),
@@ -399,15 +457,43 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                             borderRadius: BorderRadius.circular(10)),
                         child: ListTile(
                           title: Text(
-                              "Rp. ${installment.amountPaid.toStringAsFixed(2)}",
+                              CurrencyHelper.formatRupiah(
+                                  installment.amountPaid),
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87)),
+                          // title: Text(installment.amountPaid.toStringAsFixed(2),
+                          //     style: const TextStyle(
+                          //         fontWeight: FontWeight.bold,
+                          //         color: Colors.black87)),
                           subtitle: Text(
-                              "Tanggal: ${installment.datePaid.toLocal()}",
-                              style: TextStyle(color: Colors.grey[700])),
-                          leading: const Icon(Icons.check_circle,
-                              color: Colors.green),
+                              DateHelper.formatTanggalLengkap(
+                                  installment.datePaid),
+                              // "Tanggal: ${installment.datePaid.toLocal()}",
+                              style: const TextStyle(color: Colors.green)),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteInstallment(
+                                installment.id), // 🔹 Tombol hapus
+                          ),
+                          leading: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Colors
+                                  .blueGrey, // Warna latar belakang lingkaran
+                              shape: BoxShape.circle, // Bentuk lingkaran
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "${index + 1}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white, // Warna teks putih
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -415,12 +501,33 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addInstallment,
-        backgroundColor: Colors.green,
-        icon: const Icon(Icons.add),
-        label: const Text("Tambah Cicilan"),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        color: Colors
+            .white, // 🔹 Tambahkan latar belakang putih agar tombol jelas terlihat
+        child: ElevatedButton(
+          onPressed: _addInstallment,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(
+                vertical: 16), // 🔹 Ukuran tombol lebih besar
+          ),
+          child: const Text(
+            "Tambah Cicilan",
+            style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+        ),
       ),
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _addInstallment,
+      //   backgroundColor: Colors.green,
+      //   child: const Icon(Icons.add),
+      //   // label: const Text("Tambah"),
+      // ),
     );
   }
 
@@ -435,7 +542,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87)),
-          Text("Rp. ${amount.toStringAsFixed(2)}",
+          Text(CurrencyHelper.formatRupiah(amount),
               style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.bold, color: color)),
         ],

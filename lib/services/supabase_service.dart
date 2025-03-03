@@ -52,7 +52,7 @@ class SupabaseService {
           .select()
           .eq('user_id', userId)
           .order('created_at', ascending: false);
-      print(response);
+      // print(response);
       return response.map<Debt>((debt) => Debt.fromJson(debt)).toList();
     } catch (e) {
       print("❌ Error mengambil hutang dari Supabase: $e");
@@ -67,9 +67,10 @@ class SupabaseService {
         'id': installment.id,
         'debt_id': debtId,
         'amount_paid': installment.amountPaid,
-        'date_paid': installment.datePaid.toIso8601String(),
+        'date_paid': installment.datePaid.toUtc().toIso8601String(),
       });
-      // print(response);
+      print(installment.amountPaid);
+      print(installment.datePaid.toUtc().toIso8601String());
       print("✅ Cicilan berhasil disimpan!");
     } catch (e) {
       print("❌ Error menyimpan cicilan: $e");
@@ -85,7 +86,7 @@ class SupabaseService {
           .eq('debt_id', debtId)
           .order('date_paid', ascending: false);
 
-      print("🔹 Riwayat cicilan dari Supabase: $response");
+      // print("🔹 Riwayat cicilan dari Supabase: $response");
 
       if (response == null) {
         print("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
@@ -132,6 +133,16 @@ class SupabaseService {
       print("✅ Hutang dan semua cicilannya berhasil dihapus!");
     } catch (e) {
       print("❌ Error saat menghapus hutang: $e");
+      throw e;
+    }
+  }
+
+  Future<void> deleteInstallment(String installmentId) async {
+    try {
+      await supabase.from('installments').delete().eq('id', installmentId);
+      print("✅ Cicilan berhasil dihapus!");
+    } catch (e) {
+      print("❌ Error menghapus cicilan: $e");
       throw e;
     }
   }

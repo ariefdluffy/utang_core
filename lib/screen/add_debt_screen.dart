@@ -99,6 +99,7 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
         title: titleController.text.trim(),
         amount: double.parse(amountController.text.trim()),
         installments: [],
+        createdAt: DateTime.now(),
       );
 
       await ref.read(debtProvider.notifier).addDebt(newDebt);

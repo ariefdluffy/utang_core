@@ -39,7 +39,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
     try {
       await _supabaseService.addInstallment(
           debtId, installment); // Simpan ke Supabase
-
+      Logger().i(installment.datePaid);
       // 🔹 Ambil ulang cicilan dari Supabase setelah menambahkan
       await fetchInstallments(debtId);
     } catch (e) {
@@ -54,13 +54,13 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       state = state.map((debt) {
         if (debt.id == debtId) {
           return Debt(
-            id: debt.id,
-            userId: debt.userId,
-            title: debt.title,
-            amount: debt.amount,
-            installments:
-                installments, // 🔹 Perbarui cicilan dengan data terbaru
-          );
+              id: debt.id,
+              userId: debt.userId,
+              title: debt.title,
+              amount: debt.amount,
+              installments:
+                  installments, // 🔹 Perbarui cicilan dengan data terbaru
+              createdAt: debt.createdAt);
         }
         return debt;
       }).toList();
@@ -76,7 +76,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
           .from('installments')
           .select()
           .eq('debt_id', debtId)
-          .order('date_paid', ascending: false);
+          .order('date_paid', ascending: true);
 
       print("Riwayat cicilan $response");
 
@@ -120,6 +120,7 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
             title: newTitle,
             amount: newAmount,
             installments: debt.installments, // Cicilan tetap sama
+            createdAt: debt.createdAt,
           );
         }
         return debt;
@@ -137,6 +138,30 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       state = state.where((debt) => debt.id != debtId).toList();
     } catch (e) {
       print("❌ Gagal menghapus hutang: $e");
+    }
+  }
+
+  Future<void> deleteInstallment(String debtId, String installmentId) async {
+    try {
+      await _supabaseService.deleteInstallment(installmentId);
+
+      // 🔹 Perbarui state dengan menghapus cicilan dari daftar hutang terkait
+      state = state.map((debt) {
+        if (debt.id == debtId) {
+          return Debt(
+            id: debt.id,
+            userId: debt.userId,
+            title: debt.title,
+            amount: debt.amount,
+            installments:
+                debt.installments.where((i) => i.id != installmentId).toList(),
+            createdAt: debt.createdAt,
+          );
+        }
+        return debt;
+      }).toList();
+    } catch (e) {
+      print("❌ Gagal menghapus cicilan: $e");
     }
   }
 }

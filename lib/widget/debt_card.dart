@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/screen/edit_debt_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
+import 'package:utang_core/utils/currency_helper.dart';
+import 'package:utang_core/utils/date_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 import '../models/debt_model.dart';
 
@@ -17,20 +19,30 @@ class DebtCard extends ConsumerWidget {
       padding: const EdgeInsets.all(4.0),
       child: Card(
         elevation: 4,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(debt.title,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(debt.title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Dibuat : ${DateHelper.formatTanggal(debt.createdAt)}", // 🔹 Tambahkan tanggal hutang dibuat
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
               const SizedBox(height: 5),
-              Text("Total: Rp. ${debt.amount.toStringAsFixed(2)}",
-                  style: const TextStyle(fontSize: 16, color: Colors.blueGrey)),
-              const SizedBox(height: 5),
+              Text(CurrencyHelper.formatRupiah(debt.amount),
+                  style: TextStyle(fontSize: 18, color: Colors.grey[700])),
+              // const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
