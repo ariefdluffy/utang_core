@@ -155,7 +155,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
-                      "Buat Akun | Hutang Core",
+                      "Buat Akun | Utang Core",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),

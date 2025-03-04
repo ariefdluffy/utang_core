@@ -124,7 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Login | Hutang Core",
+                      "Login | Utang Core",
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),

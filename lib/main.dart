@@ -2,7 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/config/supabase_config.dart';
@@ -14,8 +14,8 @@ import 'package:utang_core/services/local_storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // MobileAds.instance.initialize();
 
-  MobileAds.instance.initialize();
   // await dotenv.load();
   await SupabaseConfig.initialize(); //
 
@@ -60,6 +60,7 @@ class _MainAppState extends ConsumerState<MainApp> {
 
     return MaterialApp(
       title: "Catatan Utang",
+      debugShowCheckedModeBanner: false,
       home: user == null ? const LoginScreen() : const HomeScreen(),
       routes: routes,
       theme: ThemeData(primarySwatch: Colors.blue),

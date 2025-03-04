@@ -89,14 +89,18 @@ class DebtNotifier extends StateNotifier<List<Debt>> {
       if (await NetworkHelper.hasInternetConnection()) {
         await _supabaseService.addInstallment(
             debtId, installment); // Simpan ke Supabase
-        Logger().i(installment.datePaid);
         // 🔹 Ambil ulang cicilan dari Supabase setelah menambahkan
+        // await fetchDebts(debtId);
         await fetchInstallments(debtId);
       } else {
         // 🔹 Jika tidak ada internet, simpan cicilan ke penyimpanan lokal
         final offlineInstallments =
             await LocalStorageService.getOfflineInstallments();
+
         offlineInstallments.add(installment);
+
+        Logger().i("Data di offlineInstallment : $installment");
+
         await LocalStorageService.saveOfflineInstallments(offlineInstallments);
       }
     } catch (e) {
