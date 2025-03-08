@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
+import 'package:utang_core/screen/about_page.dart';
 import 'package:utang_core/screen/auth/login_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
 import 'package:utang_core/utils/network_helper.dart';
@@ -95,7 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Utang Core",
+        title: const Text("Utang Core | v1",
             style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
@@ -201,10 +202,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             "Selamat datang,",
             style: TextStyle(color: Colors.white70, fontSize: 16),
           ),
-          Text(
-            email,
-            style: const TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                email,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon:
+                    const Icon(Icons.people_outline_sharp, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AboutPage()),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),
