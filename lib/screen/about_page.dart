@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/utils/date_helper.dart';
@@ -36,7 +37,7 @@ class AboutPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
+    final user = Supabase.instance.client.auth.currentUser;
 
     return Scaffold(
       appBar: AppBar(
@@ -133,13 +134,13 @@ class AboutPage extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.email,
-                              size: 14, color: Colors.deepPurpleAccent),
+                              size: 16, color: Colors.deepPurpleAccent),
                           SizedBox(width: 8),
                           Text("Kirim E-Mail",
                               style: TextStyle(
                                   color: Colors.deepPurpleAccent,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 10)),
+                                  fontSize: 12)),
                         ],
                       ),
                     ],

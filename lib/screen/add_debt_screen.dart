@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/models/debt_model.dart';
 import 'package:utang_core/utils/network_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
@@ -76,6 +77,8 @@ class AddDebtScreen extends ConsumerStatefulWidget {
 class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
+  // final supabase = Supabase.instance.client;
+
   final uuid = const Uuid();
   bool isLoading = false;
 
@@ -85,9 +88,19 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
       return;
     }
 
-    final user = ref.read(userProvider);
+    // final user = ref.read(userProvider);
+    final user = Supabase.instance.client.auth.currentUser;
+    // User? get currentUser => supabase.auth.currentUser;
     if (user == null) {
       showSnackbar(context, "Terjadi kesalahan! User tidak ditemukan.");
+      return;
+    }
+    // Konversi nilai dari amountController.text ke double
+    double amount = double.tryParse(amountController.text) ?? 0.0;
+
+    // Verifikasi jika nominal lebih kecil dari 10.000
+    if (amount < 10000) {
+      showSnackbar(context, "Nominal tidak boleh kurang dari 10.000!");
       return;
     }
 

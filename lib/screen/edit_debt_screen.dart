@@ -115,6 +115,15 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
       return;
     }
 
+    // Konversi nilai dari amountController.text ke double
+    double amount = double.tryParse(amountController.text) ?? 0.0;
+
+    // Verifikasi jika nominal lebih kecil dari 10.000
+    if (amount < 10000) {
+      showSnackbar(context, "Nominal tidak boleh kurang dari 10.000!");
+      return;
+    }
+
     final totalPaid = _getTotalPaid();
 
     // 🔹 Cek apakah jumlah hutang lebih kecil dari total cicilan yang telah dibayar
