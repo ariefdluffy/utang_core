@@ -96,7 +96,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Utang Core | v1",
+        title: const Text("Utang Core",
             style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
@@ -128,13 +128,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             const SizedBox(height: 10),
-            // BannerAdWidget(),
+            const BannerAdWidget(),
             Expanded(
               child: debts.isEmpty
                   ? const Center(
                       child: Text("Belum ada hutang",
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w500)))
+                              fontSize: 12, fontWeight: FontWeight.w500)))
                   : ListView.builder(
                       itemCount: debts.length,
                       itemBuilder: (context, index) {
@@ -174,7 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: const Text(
                   "Tambah Hutang",
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),
@@ -200,7 +200,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           const Text(
             "Selamat datang,",
-            style: TextStyle(color: Colors.white70, fontSize: 16),
+            style: TextStyle(color: Colors.white70, fontSize: 12),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -209,7 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 email,
                 style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold),
               ),
               IconButton(

@@ -67,7 +67,7 @@ import 'package:utang_core/providers/debt_providers.dart';
 // }
 
 class AddDebtScreen extends ConsumerStatefulWidget {
-  AddDebtScreen({super.key});
+  const AddDebtScreen({super.key});
 
   @override
   _AddDebtScreenState createState() => _AddDebtScreenState();
@@ -117,6 +117,7 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
       Navigator.pop(context);
     } catch (e) {
       showSnackbar(context, "Error: ${e.toString()}");
+      Logger().e(e.toString());
     } finally {
       setState(() => isLoading = false);
     }
@@ -172,7 +173,7 @@ class _AddDebtScreenState extends ConsumerState<AddDebtScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Tambah Hutang",
                         style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
               ),

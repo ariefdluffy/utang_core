@@ -12,7 +12,7 @@ import '../utils/snackbar_helper.dart';
 class PayInstallmentScreen extends ConsumerStatefulWidget {
   final Debt debt;
 
-  PayInstallmentScreen({required this.debt});
+  const PayInstallmentScreen({super.key, required this.debt});
 
   @override
   _PayInstallmentScreenState createState() => _PayInstallmentScreenState();
@@ -78,92 +78,98 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Batal",
-                  style: TextStyle(color: Colors.redAccent)),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  if (amountController.text.isEmpty) {
-                    showSnackbar(context, "Masukkan jumlah pembayaran!");
-                    return;
-                  }
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Batal",
+                      style: TextStyle(color: Colors.redAccent)),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      if (amountController.text.isEmpty) {
+                        showSnackbar(context, "Masukkan jumlah pembayaran!");
+                        return;
+                      }
 
-                  final amountPaid = double.tryParse(amountController.text);
-                  if (amountPaid == null || amountPaid <= 0) {
-                    showSnackbar(context, "Jumlah harus lebih dari 0!");
-                    return;
-                  }
+                      final amountPaid = double.tryParse(amountController.text);
+                      if (amountPaid == null || amountPaid <= 0) {
+                        showSnackbar(context, "Jumlah harus lebih dari 0!");
+                        return;
+                      }
 
-                  final totalPaid = _getTotalPaid();
-                  final remainingDebt = widget.debt.amount - totalPaid;
+                      final totalPaid = _getTotalPaid();
+                      final remainingDebt = widget.debt.amount - totalPaid;
 
-                  if (totalPaid >= widget.debt.amount) {
-                    showSnackbar(context,
-                        "Hutang sudah lunas, tidak bisa menambah cicilan!");
-                    return;
-                  }
+                      if (totalPaid >= widget.debt.amount) {
+                        showSnackbar(context,
+                            "Hutang sudah lunas, tidak bisa menambah cicilan!");
+                        return;
+                      }
 
-                  if (amountPaid > remainingDebt) {
-                    showSnackbar(context,
-                        "Cicilan lebih besar dari sisa hutang! Maksimal: Rp. ${remainingDebt.toStringAsFixed(2)}");
-                    return;
-                  }
+                      if (amountPaid > remainingDebt) {
+                        showSnackbar(context,
+                            "Cicilan lebih besar dari sisa hutang! Maksimal: Rp. ${remainingDebt.toStringAsFixed(2)}");
+                        return;
+                      }
 
-                  final installment = Installment(
-                    id: uuid.v4(),
-                    amountPaid: amountPaid,
-                    datePaid: DateTime.now().toUtc(),
-                  );
+                      final installment = Installment(
+                        id: uuid.v4(),
+                        amountPaid: amountPaid,
+                        datePaid: DateTime.now().toUtc(),
+                      );
 
-                  Logger().i(installment.datePaid);
+                      Logger().i(installment.datePaid);
 
-                  await ref
-                      .read(debtProvider.notifier)
-                      .addInstallment(widget.debt.id, installment);
+                      await ref
+                          .read(debtProvider.notifier)
+                          .addInstallment(widget.debt.id, installment);
 
-                  // 🔹 Cek apakah hutang masih ada setelah cicilan ditambahkan
-                  final newTotalPaid = totalPaid + amountPaid;
-                  final newRemainingDebt = widget.debt.amount - newTotalPaid;
+                      // 🔹 Cek apakah hutang masih ada setelah cicilan ditambahkan
+                      final newTotalPaid = totalPaid + amountPaid;
+                      final newRemainingDebt =
+                          widget.debt.amount - newTotalPaid;
 
-                  // print("ini sisa hutang $newRemainingDebt + $newTotalPaid");
-                  // print("ini debt isPaid ${widget.debt.isPaid}");
-                  // print("ini debt id ${widget.debt.id}");
+                      // print("ini sisa hutang $newRemainingDebt + $newTotalPaid");
+                      // print("ini debt isPaid ${widget.debt.isPaid}");
+                      // print("ini debt id ${widget.debt.id}");
 
-                  if (newRemainingDebt > 0 && widget.debt.isPaid) {
-                    await ref
-                        .read(debtProvider.notifier)
-                        .updateDebtStatus(widget.debt.id, false);
-                    Logger().i(
-                        "🔄 Status hutang diperbarui menjadi BELUM LUNAS (is_paid = false)");
-                  }
+                      if (newRemainingDebt > 0 && widget.debt.isPaid) {
+                        await ref
+                            .read(debtProvider.notifier)
+                            .updateDebtStatus(widget.debt.id, false);
+                        Logger().i(
+                            "🔄 Status hutang diperbarui menjadi BELUM LUNAS (is_paid = false)");
+                      }
 
-                  showSnackbar(context, "Cicilan berhasil ditambahkan!",
-                      isError: false);
+                      showSnackbar(context, "Cicilan berhasil ditambahkan!",
+                          isError: false);
 
-                  amountController.clear();
-                  _fetchInstallments();
+                      amountController.clear();
+                      _fetchInstallments();
 
-                  Navigator.pop(context);
-                  setState(() {});
-                } catch (e) {
-                  showSnackbar(context, "Error: ${e.toString()}");
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text(
-                "Simpan",
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
+                      Navigator.pop(context);
+                      setState(() {});
+                    } catch (e) {
+                      showSnackbar(context, "Error: ${e.toString()}");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    "Simpan",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -296,7 +302,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
             child: updatedDebt.installments.isEmpty
                 ? const Center(
                     child: Text("Belum ada cicilan",
-                        style: TextStyle(fontSize: 16)))
+                        style: TextStyle(fontSize: 14)))
                 : ListView.builder(
                     itemCount: updatedDebt.installments.length,
                     itemBuilder: (context, index) {
@@ -365,7 +371,7 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
                 child: const Text(
                   "Tambah Cicilan",
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
                 ),

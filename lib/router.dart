@@ -7,5 +7,5 @@ Map<String, WidgetBuilder> routes = {
   // "/": (context) => LoginScreen(),
   "/home": (context) => const HomeScreen(),
   "/register": (context) => const RegisterScreen(),
-  "/add-debt": (context) => AddDebtScreen()
+  "/add-debt": (context) => const AddDebtScreen()
 };

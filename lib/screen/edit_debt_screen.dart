@@ -82,7 +82,7 @@ import '../models/debt_model.dart';
 class EditDebtScreen extends ConsumerStatefulWidget {
   final Debt debt;
 
-  EditDebtScreen({super.key, required this.debt});
+  const EditDebtScreen({super.key, required this.debt});
 
   @override
   _EditDebtScreenState createState() => _EditDebtScreenState();
@@ -210,7 +210,7 @@ class _EditDebtScreenState extends ConsumerState<EditDebtScreen> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Simpan Perubahan",
                         style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.white)),
               ),

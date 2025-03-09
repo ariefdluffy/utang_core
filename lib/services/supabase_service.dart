@@ -31,7 +31,7 @@ class SupabaseService {
 
   Future<void> addDebt(Debt debt) async {
     try {
-      final response = await supabase.from('debts').insert({
+      await supabase.from('debts').insert({
         'id': debt.id,
         'user_id': debt.userId,
         'title': debt.title,
@@ -42,7 +42,7 @@ class SupabaseService {
       // print("✅ Hutang berhasil disimpan!");
     } catch (e) {
       Logger().e("❌ Error saat menyimpan hutang ke Supabase: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -75,7 +75,7 @@ class SupabaseService {
       // print("✅ Cicilan berhasil disimpan!");
     } catch (e) {
       Logger().e("❌ Error menyimpan cicilan: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -89,16 +89,16 @@ class SupabaseService {
 
       // print("🔹 Riwayat cicilan dari Supabase: $response");
 
-      if (response == null) {
-        Logger().i("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
-        return [];
-      }
+      // if (response == null) {
+      //   Logger().i("⚠️ Tidak ada cicilan ditemukan untuk debtId: $debtId");
+      //   return [];
+      // }
 
-      if (response is! List) {
-        Logger()
-            .e("❌ Error: Response bukan List, tipe: ${response.runtimeType}");
-        return [];
-      }
+      // if (response is! List) {
+      //   Logger()
+      //       .e("❌ Error: Response bukan List, tipe: ${response.runtimeType}");
+      //   return [];
+      // }
 
       return (response as List<dynamic>)
           .map<Installment>((data) => Installment.fromJson(data))
@@ -121,7 +121,7 @@ class SupabaseService {
       // print("✅ Hutang berhasil diperbarui!");
     } catch (e) {
       Logger().e("❌ Error saat memperbarui hutang: $e");
-      throw e;
+      rethrow;
     }
   }
 
@@ -137,10 +137,10 @@ class SupabaseService {
       // 🔹 Hapus hutang utama
       await supabase.from('debts').delete().eq('id', debtId);
 
-      print("✅ Hutang dan semua cicilannya berhasil dihapus!");
+      Logger().i("✅ Hutang dan semua cicilannya berhasil dihapus!");
     } catch (e) {
-      print("❌ Error saat menghapus hutang: $e");
-      throw e;
+      Logger().e("❌ Error saat menghapus hutang: $e");
+      rethrow;
     }
   }
 
@@ -150,7 +150,7 @@ class SupabaseService {
       // print("✅ Cicilan berhasil dihapus!");
     } catch (e) {
       Logger().d("❌ Error menghapus cicilan: $e");
-      throw e;
+      rethrow;
     }
   }
 }

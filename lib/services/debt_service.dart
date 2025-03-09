@@ -18,17 +18,17 @@ class DebtService {
 
   static Future<void> addDebt(Debt debt) async {
     try {
-      print("🔹 Data yang dikirim: ${debt.toJson()}"); // Debugging
+      Logger().i("🔹 Data yang dikirim: ${debt.toJson()}"); // Debugging
 
       final response = await supabase.from('debts').insert(debt.toJson());
 
       if (response.error != null) {
-        print("❌ Error: ${response.toString()}");
+        Logger().e("❌ Error: ${response.toString()}");
       } else {
-        print("✅ Hutang berhasil disimpan!");
+        Logger().i("✅ Hutang berhasil disimpan! <dev_service>");
       }
     } catch (e) {
-      print("❌ Exception: $e");
+      Logger().e("❌ Exception: $e");
     }
   }
 

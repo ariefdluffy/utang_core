@@ -15,3 +15,9 @@ class DateHelper {
     return formatTanggal(date);
   }
 }
+
+String formatTanggal(String utcDate) {
+  DateTime dateTime =
+      DateTime.parse(utcDate).toLocal(); // Ubah ke zona waktu lokal
+  return DateFormat("dd MMMM yyyy HH:mm", "id_ID").format(dateTime);
+}

@@ -1,19 +1,23 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:utang_core/providers/auth_providers.dart';
+import 'package:utang_core/utils/date_helper.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends ConsumerWidget {
   const AboutPage({super.key});
 
   // 🔹 Fungsi untuk membuka tautan donasi
-  void _launchDonationURL() async {
-    final Uri url = Uri.parse(
-        "https://www.buymeacoffee.com/miftahularif.dev"); // Ganti dengan link donasi Anda
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      debugPrint("❌ Tidak dapat membuka tautan donasi.");
-    }
-  }
+  // void _launchDonationURL() async {
+  //   final Uri url = Uri.parse(
+  //       "https://www.buymeacoffee.com/miftahularif.dev"); // Ganti dengan link donasi Anda
+  //   if (await canLaunchUrl(url)) {
+  //     await launchUrl(url, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     debugPrint("❌ Tidak dapat membuka tautan donasi.");
+  //   }
+  // }
 
   // 🔹 Fungsi untuk mengirim email ke developer
   void _sendEmail() async {
@@ -31,126 +35,193 @@ class AboutPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Tentang Aplikasi"),
+        title: const Text(
+          "About Me",
+        ),
         backgroundColor: Colors.deepPurpleAccent,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // 🔹 Logo Aplikasi
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(50),
-            //   child: Image.asset(
-            //     "assets/logo.png", // Ganti dengan logo aplikasi Anda
-            //     width: 100,
-            //     height: 100,
-            //   ),
-            // ),
-            // const SizedBox(height: 16),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.mail, color: Colors.blue),
+                title: const Text("Email",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("${user!.email}",
+                    style: const TextStyle(fontSize: 12)),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.shield_outlined, color: Colors.green),
+                title: const Text("Status",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(user.aud, style: const TextStyle(fontSize: 12)),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.calendar_month, color: Colors.orange),
+                title: const Text("Dibuat",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(formatTanggal(user.createdAt),
+                    style: const TextStyle(fontSize: 12)),
+              ),
+              const Divider(),
+              ListTile(
+                leading:
+                    const Icon(Icons.calendar_month, color: Colors.blueAccent),
+                title: const Text("Terakhir Log-In",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(formatTanggal('${user.lastSignInAt}'),
+                    style: const TextStyle(fontSize: 12)),
+              ),
+              // 🔹 Logo Aplikasi
+              // ClipRRect(
+              //   borderRadius: BorderRadius.circular(50),
+              //   child: Image.asset(
+              //     "assets/logo.png", // Ganti dengan logo aplikasi Anda
+              //     width: 100,
+              //     height: 100,
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
 
-            // 🔹 Nama Aplikasi
-            const Text(
-              "Utang Core",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
+              // 🔹 Nama Aplikasi
+              // const Text(
+              //   "Utang Core",
+              //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              // ),
 
-            // 🔹 Versi Aplikasi
-            const Text(
-              "Versi 1.1.0",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
+              // 🔹 Versi Aplikasi
+              // const Text(
+              //   "Versi 1.1.0",
+              //   style: TextStyle(fontSize: 12, color: Colors.grey),
+              // ),
+              const Divider(),
+              const SizedBox(height: 16),
 
-            // 🔹 Deskripsi Aplikasi
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
-                child: Column(
+              // 🔹 Deskripsi Aplikasi
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Utang Core",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Aplikasi Utang Core membantu Anda mencatat hutang dan cicilan dengan mudah. ",
+                        // "Dilengkapi dengan fitur laporan dan notifikasi untuk mengingatkan pembayaran hutang.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.email,
+                              size: 14, color: Colors.deepPurpleAccent),
+                          SizedBox(width: 8),
+                          Text("Kirim E-Mail",
+                              style: TextStyle(
+                                  color: Colors.deepPurpleAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 🔹 Tombol Donasi
+              // ElevatedButton.icon(
+              //   onPressed: _launchDonationURL,
+              //   icon: const Icon(Icons.favorite, color: Colors.white),
+              //   label: const Text(
+              //     "Dukung dengan Donasi",
+              //     style: TextStyle(
+              //         fontSize: 16,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.white),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.orange,
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              //     shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(12)),
+              //   ),
+              // ),
+              const SizedBox(height: 10),
+
+              // 🔹 Tombol Hubungi Developer
+              // ElevatedButton.icon(
+              //   onPressed: _sendEmail,
+              //   icon: const Icon(Icons.email, color: Colors.white),
+              //   label: const Text(
+              //     "Hubungi Developer",
+              //     style: TextStyle(
+              //         fontSize: 12,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.white),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: Colors.blueAccent,
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(12),
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 30),
+
+              // 🔹 Copyright / Credit
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 10, color: Colors.grey),
                   children: [
-                    Text(
-                      "Aplikasi Utang Core membantu Anda mencatat hutang dan cicilan dengan mudah. "
-                      "Dilengkapi dengan fitur laporan dan notifikasi untuk mengingatkan pembayaran hutang.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.email, color: Colors.deepPurpleAccent),
-                        SizedBox(width: 8),
-                        Text("miftahularif.dev@gmail.com",
-                            style: TextStyle(
-                                color: Colors.deepPurpleAccent,
-                                fontWeight: FontWeight.bold)),
-                      ],
+                    const TextSpan(
+                        text:
+                            "© 2025 Utang Core V1.1.1 - \nDibuat dengan ❤️ oleh "),
+                    TextSpan(
+                      text: "Miftahularif",
+                      style: const TextStyle(
+                        color: Colors.blue, // Warna teks yang dapat diklik
+                        decoration: TextDecoration
+                            .underline, // Garis bawah untuk menunjukkan bahwa teks dapat diklik
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          // Fungsi untuk mengirim email
+                          _sendEmail();
+                        },
                     ),
                   ],
                 ),
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 🔹 Tombol Donasi
-            // ElevatedButton.icon(
-            //   onPressed: _launchDonationURL,
-            //   icon: const Icon(Icons.favorite, color: Colors.white),
-            //   label: const Text(
-            //     "Dukung dengan Donasi",
-            //     style: TextStyle(
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.bold,
-            //         color: Colors.white),
-            //   ),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.orange,
-            //     padding:
-            //         const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12)),
-            //   ),
-            // ),
-            const SizedBox(height: 10),
-
-            // 🔹 Tombol Hubungi Developer
-            ElevatedButton.icon(
-              onPressed: _sendEmail,
-              icon: const Icon(Icons.email, color: Colors.white),
-              label: const Text(
-                "Hubungi Developer",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+              const SizedBox(
+                height: 10,
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            const SizedBox(height: 30),
-
-            // 🔹 Copyright / Credit
-            const Text(
-              "© 2025 Utang Core - Dibuat dengan ❤️ oleh Miftahul arif",
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

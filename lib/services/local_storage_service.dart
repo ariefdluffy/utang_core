@@ -64,6 +64,6 @@ class LocalStorageService {
     final allData =
         prefs.getKeys().map((key) => {key: prefs.get(key)}).toList();
 
-    // Logger().i("Data SharedPreferences $allData");
+    Logger().i("Data SharedPreferences $allData");
   }
 }
