@@ -5,6 +5,7 @@ import 'package:utang_core/models/installment_model.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/utils/currency_helper.dart';
 import 'package:utang_core/utils/date_helper.dart';
+import 'package:utang_core/widget/interstitial_ad_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../models/debt_model.dart';
 import '../utils/snackbar_helper.dart';
@@ -22,10 +23,27 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
   final TextEditingController amountController = TextEditingController();
   final uuid = const Uuid();
 
+  final InterstitialAdHelper _adHelper = InterstitialAdHelper();
+
   @override
   void initState() {
     super.initState();
     _fetchInstallments(); // 🔹 Ambil data cicilan saat halaman dibuka
+    _adHelper.loadAd(() {
+      Navigator.pop(context); // 🔄 Kembali ke Home setelah iklan ditutup
+    });
+  }
+
+  /// 🔹 Tangani event "Back"
+  bool _onWillPop() {
+    _adHelper.showAd(context);
+    return false; // ❌ Cegah navigasi langsung tanpa menampilkan iklan
+  }
+
+  @override
+  void dispose() {
+    _adHelper.disposeAd();
+    super.dispose();
   }
 
   void _fetchInstallments() {
@@ -256,128 +274,136 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
       });
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Riwayat Cicilan",
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.deepPurpleAccent,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      updatedDebt
-                          .title, // 🔹 Tambahkan Title Hutang dari tabel debts
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+    return PopScope(
+      canPop: false, // ❌ Blokir pop biasa agar bisa tampilkan iklan dulu
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          _onWillPop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Riwayat Cicilan",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.deepPurpleAccent,
+          foregroundColor: Colors.white,
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        updatedDebt
+                            .title, // 🔹 Tambahkan Title Hutang dari tabel debts
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
-                    const Divider(),
-                    _buildDebtInfo(
-                        "Total Hutang", updatedDebt.amount, Colors.blueGrey),
-                    const Divider(),
-                    _buildDebtInfo("Total Dibayar", totalPaid, Colors.green),
-                    const Divider(),
-                    _buildDebtInfo("Sisa Hutang", remainingDebt, Colors.red),
-                  ],
+                      const Divider(),
+                      _buildDebtInfo(
+                          "Total Hutang", updatedDebt.amount, Colors.blueGrey),
+                      const Divider(),
+                      _buildDebtInfo("Total Dibayar", totalPaid, Colors.green),
+                      const Divider(),
+                      _buildDebtInfo("Sisa Hutang", remainingDebt, Colors.red),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const Divider(),
-          Expanded(
-            child: updatedDebt.installments.isEmpty
-                ? const Center(
-                    child: Text("Belum ada cicilan",
-                        style: TextStyle(fontSize: 14)))
-                : ListView.builder(
-                    itemCount: updatedDebt.installments.length,
-                    itemBuilder: (context, index) {
-                      final installment = updatedDebt.installments[index];
-                      return Card(
-                        elevation: 2,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: ListTile(
-                          title: Text(
-                              CurrencyHelper.formatRupiah(
-                                  installment.amountPaid),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87)),
-                          subtitle: Text(
-                              DateHelper.formatTanggalLengkap(
-                                  installment.datePaid),
-                              // "Tanggal: ${installment.datePaid.toLocal()}",
-                              style: const TextStyle(color: Colors.green)),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _deleteInstallment(
-                                installment.id), // 🔹 Tombol hapus
-                          ),
-                          leading: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: const BoxDecoration(
-                              color: Colors
-                                  .green, // Warna latar belakang lingkaran
-                              shape: BoxShape.circle, // Bentuk lingkaran
+            const Divider(),
+            Expanded(
+              child: updatedDebt.installments.isEmpty
+                  ? const Center(
+                      child: Text("Belum ada cicilan",
+                          style: TextStyle(fontSize: 14)))
+                  : ListView.builder(
+                      itemCount: updatedDebt.installments.length,
+                      itemBuilder: (context, index) {
+                        final installment = updatedDebt.installments[index];
+                        return Card(
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ListTile(
+                            title: Text(
+                                CurrencyHelper.formatRupiah(
+                                    installment.amountPaid),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87)),
+                            subtitle: Text(
+                                DateHelper.formatTanggalLengkap(
+                                    installment.datePaid),
+                                // "Tanggal: ${installment.datePaid.toLocal()}",
+                                style: const TextStyle(color: Colors.green)),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteInstallment(
+                                  installment.id), // 🔹 Tombol hapus
                             ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              "${index + 1}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white, // Warna teks putih
+                            leading: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: const BoxDecoration(
+                                color: Colors
+                                    .green, // Warna latar belakang lingkaran
+                                shape: BoxShape.circle, // Bentuk lingkaran
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${index + 1}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white, // Warna teks putih
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: remainingDebt >
+                0 // 🔹 Tombol tambah cicilan hanya muncul jika hutang belum lunas
+            ? Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.white,
+                child: ElevatedButton(
+                  onPressed: _addInstallment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-          ),
-        ],
+                  child: const Text(
+                    "Tambah Cicilan",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            : null, // 🔹 Jika hutang lunas, tombol tidak ditampilkan
       ),
-      bottomNavigationBar: remainingDebt >
-              0 // 🔹 Tombol tambah cicilan hanya muncul jika hutang belum lunas
-          ? Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.white,
-              child: ElevatedButton(
-                onPressed: _addInstallment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: const Text(
-                  "Tambah Cicilan",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-              ),
-            )
-          : null, // 🔹 Jika hutang lunas, tombol tidak ditampilkan
     );
   }
 
