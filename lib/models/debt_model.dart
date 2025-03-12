@@ -4,6 +4,7 @@ class Debt {
   final String id;
   final String userId;
   final String title;
+
   final double amount;
   final List<Installment> installments;
   final DateTime createdAt;
@@ -17,6 +18,9 @@ class Debt {
       required this.installments,
       required this.createdAt,
       required this.isPaid});
+
+  double get totalPaid =>
+      installments.fold(0, (sum, item) => sum + item.amountPaid);
 
   // 🔹 Perbaikan: Tangani `installments` yang mungkin null
   factory Debt.fromJson(Map<String, dynamic> json) {

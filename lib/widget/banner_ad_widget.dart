@@ -20,19 +20,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   void initState() {
     super.initState();
     _loadAd();
-    // 🔹 Reload iklan setiap 60 detik
-    // _adReloadTimer = Timer.periodic(const Duration(seconds: 60), (timer) {
-    //   _reloadBannerAd();
-    // });
   }
-
-  // void _reloadBannerAd() {
-  //   _bannerAd?.dispose(); // 🔹 Hapus iklan lama
-  //   setState(() {
-  //     _isAdLoaded = false;
-  //   });
-  //   _loadAd(); // 🔹 Muat ulang iklan baru
-  // }
 
   void _loadAd() {
     _bannerAd = BannerAd(

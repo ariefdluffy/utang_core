@@ -1,26 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:utang_core/providers/auth_providers.dart';
+import 'package:utang_core/ads/ad_banner_about.dart';
 import 'package:utang_core/utils/date_helper.dart';
 
 class AboutPage extends ConsumerWidget {
   const AboutPage({super.key});
 
-  // 🔹 Fungsi untuk membuka tautan donasi
-  // void _launchDonationURL() async {
-  //   final Uri url = Uri.parse(
-  //       "https://www.buymeacoffee.com/miftahularif.dev"); // Ganti dengan link donasi Anda
-  //   if (await canLaunchUrl(url)) {
-  //     await launchUrl(url, mode: LaunchMode.externalApplication);
-  //   } else {
-  //     debugPrint("❌ Tidak dapat membuka tautan donasi.");
-  //   }
-  // }
-
-  // 🔹 Fungsi untuk mengirim email ke developer
   void _sendEmail() async {
     final Uri emailUri = Uri(
       scheme: 'mailto',
@@ -38,6 +27,7 @@ class AboutPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = Supabase.instance.client.auth.currentUser;
+    final bannerAd = ref.watch(bannerAdProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -219,8 +209,16 @@ class AboutPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(
-                height: 10,
+                height: 50,
               ),
+              if (bannerAd != null &&
+                  bannerAd.responseInfo !=
+                      null) // 🔹 Menampilkan Banner Ads jika berhasil dimuat
+                SizedBox(
+                  height: bannerAd.size.height.toDouble(),
+                  width: bannerAd.size.width.toDouble(),
+                  child: AdWidget(ad: bannerAd),
+                ),
             ],
           ),
         ),

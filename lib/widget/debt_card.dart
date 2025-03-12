@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/screen/edit_debt_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
@@ -9,6 +10,10 @@ import 'package:utang_core/utils/snackbar_helper.dart';
 import '../models/debt_model.dart';
 
 class DebtCard extends ConsumerWidget {
+  double _getTotalPaid() {
+    return debt.installments.fold(0, (sum, item) => sum + item.amountPaid);
+  }
+
   final Debt debt;
 
   const DebtCard({super.key, required this.debt});
@@ -57,6 +62,8 @@ class DebtCard extends ConsumerWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 5),
+
               // const SizedBox(height: 5),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
