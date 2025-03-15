@@ -69,7 +69,7 @@ class DeviceInfoHelper {
         await _updateSendStatus();
       } else {
         Logger().i(
-            'Batas pengiriman pesan telah tercapai (maksimal 1 kali per jam).');
+            'Batas pengiriman pesan telah tercapai (maksimal 1 kali per 2 Jam).');
       }
     } catch (e) {
       throw Exception(
@@ -84,7 +84,7 @@ class DeviceInfoHelper {
     final sendCount = prefs.getInt('sendCount') ?? 0;
 
     final now = DateTime.now().millisecondsSinceEpoch;
-    const oneHourInMillis = 60 * 60 * 1000; // 1 jam dalam milidetik
+    const oneHourInMillis = 2 * 60 * 60 * 1000; // 1 jam dalam milidetik
 
     // Jika lebih dari 1 jam sejak pengiriman terakhir, reset counter
     if (now - lastSendTime > oneHourInMillis) {

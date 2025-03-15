@@ -8,6 +8,8 @@ class InterstitialAdHelper {
   /// 🔹 Muat iklan Interstitial
   void loadAd(VoidCallback onAdDismissed) {
     InterstitialAd.load(
+      // adUnitId:
+      //     'ca-app-pub-3940256099942544/1033173712', // Ganti dengan ID asli
       adUnitId:
           'ca-app-pub-2393357737286916/6618035772', // Ganti dengan ID asli
       request: const AdRequest(),

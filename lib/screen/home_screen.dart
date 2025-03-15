@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
+import 'package:utang_core/screen/about2_page.dart';
 import 'package:utang_core/screen/about_page.dart';
 import 'package:utang_core/screen/auth/login_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
@@ -31,9 +33,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final DeviceInfoHelper deviceInfoHelper = DeviceInfoHelper(
     telegramHelper: TelegramHelper(
-      botToken:
-          '7678341666:AAH_6GTin6WCzxx0zOoySoeZfz6b8FgRfFU', // Ganti dengan token bot Anda
-      chatId: '111519789', // Ganti dengan chat ID Anda
+      botToken: dotenv.env['BOT_TOKEN'] ?? '', // Ganti dengan token bot Anda
+      chatId: dotenv.env['CHAT_ID'] ?? '', // Ganti dengan chat ID Anda
     ),
   );
   bool isLoading = true;
@@ -245,7 +246,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AboutPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const AboutPageNew()),
                   );
                 },
               ),
