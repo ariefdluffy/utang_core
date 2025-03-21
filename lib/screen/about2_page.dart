@@ -150,7 +150,7 @@ class _AboutPageState extends ConsumerState<AboutPageNew> {
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         const Text(
                           "Aplikasi Utang Core membantu Anda mencatat hutang dan cicilan dengan mudah.",
                           textAlign: TextAlign.center,
@@ -159,13 +159,13 @@ class _AboutPageState extends ConsumerState<AboutPageNew> {
                         const SizedBox(height: 10),
                         GestureDetector(
                           onTap: _sendEmail,
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.email,
+                              Icon(Icons.email,
                                   size: 16, color: Colors.deepPurpleAccent),
-                              const SizedBox(width: 8),
-                              Text("Kirim E-Mail",
+                              SizedBox(width: 8),
+                              Text("miftahularif.dev@gmail.com",
                                   style: TextStyle(
                                       color: Colors.deepPurpleAccent,
                                       fontWeight: FontWeight.bold,
@@ -173,32 +173,34 @@ class _AboutPageState extends ConsumerState<AboutPageNew> {
                             ],
                           ),
                         ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "© 2025 Utang Core V1.1.4",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 10),
+                        ),
                       ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
-                // 🔹 Copyright / Credit
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
-                    children: [
-                      const TextSpan(
-                          text:
-                              "© 2025 Utang Core V1.1.1 - \nDibuat dengan ❤️ oleh "),
-                      TextSpan(
-                        text: "Miftahularif",
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()..onTap = _sendEmail,
-                      ),
-                    ],
-                  ),
+                Image.asset(
+                  'assets/logo_ewallet.png',
+                  width: 130,
+                  // height: 120,
+                  fit: BoxFit.cover,
+                ),
+                // const SizedBox(height: 8),
+                const SizedBox(
+                  width: double.infinity,
+                  child: Text("0852-5088-7277",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12)),
                 ),
                 const SizedBox(height: 30),
 

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/screen/auth/register_screen.dart';
+import 'package:utang_core/screen/home_screen.dart';
+import 'package:utang_core/services/auth_service.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
+import 'package:utang_core/widget/disclaimer_dialog.dart';
 
 // class LoginScreen extends ConsumerWidget {
 //   final TextEditingController emailController = TextEditingController();
@@ -74,6 +77,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   bool isLoading = false;
 
   void _login() async {
@@ -175,6 +179,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
+                    const Divider(),
+                    Center(
+                      child: Column(
+                        children: [
+                          // const SizedBox(height: 10),
+                          IconButton(
+                            icon: Image.asset("assets/sign_in_google.png",
+                                width: 180, height: 60),
+                            onPressed: () async {
+                              final success =
+                                  await AuthService().signInWithGoogle(ref);
+                              if (success) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeScreen()),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text("Gagal masuk dengan Google")),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    // const SizedBox(height: 10),
                     Center(
                       child: TextButton(
                         onPressed: () {
@@ -184,10 +218,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 builder: (context) => const RegisterScreen()),
                           );
                         },
-                        child: const Text("Belum punya akun? Daftar",
+                        child: const Text("Belum punya akun? Klik Daftar",
                             style: TextStyle(
-                                fontSize: 16, color: Colors.deepPurpleAccent)),
+                                fontSize: 14, color: Colors.deepPurpleAccent)),
                       ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.info_outline,
+                          color: Colors.deepPurpleAccent),
+                      title: const Text("Disclaimer"),
+                      onTap: () {
+                        showDisclaimerDialog(context);
+                      },
                     ),
                   ],
                 ),

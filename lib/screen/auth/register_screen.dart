@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/screen/auth/login_screen.dart';
+import 'package:utang_core/screen/home_screen.dart';
+import 'package:utang_core/services/auth_service.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
+import 'package:utang_core/widget/disclaimer_dialog.dart';
 
 // class RegisterScreen extends ConsumerWidget {
 //   final TextEditingController emailController = TextEditingController();
@@ -216,7 +219,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     color: Colors.white)),
                       ),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 10),
+                    const Divider(),
                     Center(
                       child: TextButton(
                         onPressed: () {
@@ -230,6 +234,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             style: TextStyle(
                                 fontSize: 16, color: Colors.blueAccent)),
                       ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.info_outline,
+                          color: Colors.deepPurpleAccent),
+                      title: const Text("Disclaimer"),
+                      onTap: () {
+                        showDisclaimerDialog(context);
+                      },
                     ),
                   ],
                 ),

@@ -126,7 +126,7 @@ class AboutPage extends ConsumerWidget {
                           Icon(Icons.email,
                               size: 16, color: Colors.deepPurpleAccent),
                           SizedBox(width: 8),
-                          Text("Kirim E-Mail",
+                          Text("miftahularif.dev@gmail.com",
                               style: TextStyle(
                                   color: Colors.deepPurpleAccent,
                                   fontWeight: FontWeight.bold,
@@ -191,7 +191,7 @@ class AboutPage extends ConsumerWidget {
                   children: [
                     const TextSpan(
                         text:
-                            "© 2025 Utang Core V1.1.1 - \nDibuat dengan ❤️ oleh "),
+                            "© 2025 Utang Core V1.1.4 - \nDibuat dengan ❤️ oleh "),
                     TextSpan(
                       text: "Miftahularif",
                       style: const TextStyle(
