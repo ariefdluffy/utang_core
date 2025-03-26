@@ -130,7 +130,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Text(
                       "Login | Utang Core",
                       style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     const Text("Mengelola catatan hutang Anda",
@@ -180,35 +180,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 15),
                     const Divider(),
-                    Center(
-                      child: Column(
-                        children: [
-                          // const SizedBox(height: 10),
-                          IconButton(
-                            icon: Image.asset("assets/sign_in_google.png",
-                                width: 180, height: 60),
-                            onPressed: () async {
-                              final success =
-                                  await AuthService().signInWithGoogle(ref);
-                              if (success) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                          Text("Gagal masuk dengan Google")),
-                                );
-                              }
-                            },
+                    SizedBox(
+                      width: double.infinity, // Full width
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await AuthService().signInWithGoogle();
+                            if (mounted) {
+                              Navigator.pushReplacementNamed(context, "/home");
+                              // showSnackbar(context, "Login berhasil.",
+                              //     isError: false);
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              showSnackbar(context, "Error: ${e.toString()}");
+                            }
+                          }
+                        },
+                        icon: Image.asset(
+                          'assets/logo_google.png', // Pastikan ikon Google ada di assets/icons/
+                          height: 24,
+                        ),
+                        label: const Text(
+                          "Sign in with Google",
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black87,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: const BorderSide(color: Colors.grey),
                           ),
-                        ],
+                          elevation: 2,
+                        ),
                       ),
                     ),
-                    // const SizedBox(height: 10),
                     Center(
                       child: TextButton(
                         onPressed: () {
