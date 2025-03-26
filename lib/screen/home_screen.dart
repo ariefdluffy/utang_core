@@ -9,7 +9,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/screen/about2_page.dart';
-import 'package:utang_core/screen/about_page.dart';
 import 'package:utang_core/screen/auth/login_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
 import 'package:utang_core/utils/device_info_helper.dart';

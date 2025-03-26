@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/screen/auth/register_screen.dart';
-import 'package:utang_core/screen/home_screen.dart';
 import 'package:utang_core/services/auth_service.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 import 'package:utang_core/widget/disclaimer_dialog.dart';
@@ -185,16 +184,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           try {
-                            await AuthService().signInWithGoogle();
-                            if (mounted) {
+                            final success =
+                                await AuthService().signInWithGoogle();
+                            if (success) {
                               Navigator.pushReplacementNamed(context, "/home");
-                              // showSnackbar(context, "Login berhasil.",
-                              //     isError: false);
+                              showSnackbar(context, "Login berhasil.",
+                                  isError: false);
                             }
                           } catch (e) {
-                            if (mounted) {
-                              showSnackbar(context, "Error: ${e.toString()}");
-                            }
+                            showSnackbar(context, "Error: ${e.toString()}");
                           }
                         },
                         icon: Image.asset(

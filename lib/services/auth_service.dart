@@ -14,11 +14,6 @@ class AuthService {
     try {
       final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'];
 
-      /// iOS Client ID that you registered with Google Cloud.
-      // const iosClientId = 'my-ios.apps.googleusercontent.com';
-      // Logout terlebih dahulu agar pengguna diminta memilih akun lagi
-      // await supabase.auth.signOut();
-
       final GoogleSignIn googleSignIn = GoogleSignIn(
         // clientId: iosClientId,
         serverClientId: webClientId,
@@ -32,6 +27,7 @@ class AuthService {
       } else {
         final googleAuth = await googleUser.authentication;
         final idToken = googleAuth.idToken;
+        final accessToken = googleAuth.accessToken;
 
         if (idToken == null) {
           throw 'No ID Token found.';
@@ -40,6 +36,7 @@ class AuthService {
         await supabase.auth.signInWithIdToken(
           provider: OAuthProvider.google,
           idToken: idToken,
+          accessToken: accessToken,
         );
         return true;
       }

@@ -5,8 +5,6 @@ import 'package:utang_core/models/installment_model.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/utils/currency_helper.dart';
 import 'package:utang_core/utils/date_helper.dart';
-import 'package:utang_core/utils/device_info_helper.dart';
-import 'package:utang_core/utils/tele_helper.dart';
 import 'package:utang_core/widget/interstitial_ad_widget.dart';
 import 'package:uuid/uuid.dart';
 import '../models/debt_model.dart';

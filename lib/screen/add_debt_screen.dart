@@ -6,7 +6,6 @@ import 'package:utang_core/models/debt_model.dart';
 import 'package:utang_core/utils/network_helper.dart';
 import 'package:utang_core/utils/snackbar_helper.dart';
 import 'package:uuid/uuid.dart';
-import 'package:utang_core/providers/auth_providers.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 
 // class AddDebtScreen extends ConsumerWidget {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logger/logger.dart';
 import 'package:utang_core/providers/debt_providers.dart';
 import 'package:utang_core/screen/edit_debt_screen.dart';
 import 'package:utang_core/screen/pay_installment_screen.dart';
