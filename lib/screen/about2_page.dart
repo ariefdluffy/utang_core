@@ -174,7 +174,7 @@ class _AboutPageState extends ConsumerState<AboutPageNew> {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          "© 2025 Utang Core V1.1.4",
+                          "© 2025 Utang Core V1.1.5",
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 10),
                         ),
@@ -187,7 +187,7 @@ class _AboutPageState extends ConsumerState<AboutPageNew> {
 
                 Image.asset(
                   'assets/logo_ewallet.png',
-                  width: 130,
+                  width: 120,
                   // height: 120,
                   fit: BoxFit.cover,
                 ),

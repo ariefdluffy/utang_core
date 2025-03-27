@@ -35,11 +35,11 @@ class DebtCard extends ConsumerWidget {
                 children: [
                   Text(debt.title,
                       style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold)),
+                          fontSize: 14, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 5),
                   Text(
                     "Dibuat : ${DateHelper.formatTanggal(debt.createdAt)}", // 🔹 Tambahkan tanggal hutang dibuat
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    style: const TextStyle(fontSize: 10, color: Colors.black54),
                   ),
                 ],
               ),
@@ -49,7 +49,10 @@ class DebtCard extends ConsumerWidget {
                 children: [
                   Text(
                     CurrencyHelper.formatRupiah(debt.amount),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.bold),
                   ),
                   Text(
                     debt.isPaid ? "Lunas" : "Belum Lunas",
